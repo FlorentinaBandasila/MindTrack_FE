@@ -1,0 +1,91 @@
+###############################################################################
+# Global                                                                    #
+###############################################################################
+# OS & editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+###############################################################################
+# Flutter & Dart                                                             #
+###############################################################################
+# Generated packages & tool metadata
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.melofile
+.pub/
+.pub-cache/
+
+# Build outputs
+build/
+
+# Test outputs
+test_output/
+
+###############################################################################
+# Android                                                                    #
+###############################################################################
+android/.gradle/
+android/local.properties        # holds local SDK paths
+android/key.properties          # signing keys (keep private!)
+android/*.keystore
+android/app/*.iml
+android/gradle/
+android/.idea/
+*.iml
+
+###############################################################################
+# iOS / macOS                                                                #
+###############################################################################
+# CocoaPods
+ios/Pods/
+macos/Pods/
+
+# Flutter‑generated frameworks & ephemerals
+ios/Flutter/
+macos/Flutter/
+
+# Xcode artifacts
+ios/Runner.xcworkspace
+macos/Runner.xcworkspace
+DerivedData/
+*.xcuserdatad
+*.xcuserstate
+*.xcworkspace
+
+# Build outputs
+ios/build/
+macos/build/
+
+###############################################################################
+# Windows & Linux (if you add desktop)                                       #
+###############################################################################
+windows/build/
+linux/build/
+
+###############################################################################
+# Web (if you add web)                                                       #
+###############################################################################
+web/build/
+
+###############################################################################
+# Misc                                                                       #
+###############################################################################
+# Crashlytics / Firebase
+**/fabric.properties
+**/crashlytics-build.properties
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+
+# Symbolicator
+symbols/
+
+###############################################################################
+# End                                                                        #
+###############################################################################

@@ -1,0 +1,30 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+class UserService {
+  Future<User?> fetchUser(String username) async {
+    try {
+      // IMPORTANT: If you're running the .NET server on Windows at localhost:5175
+      // AND using an Android emulator, use 10.0.2.2:5175 instead of localhost.
+      final url = Uri.parse("http://10.0.2.2:5175/api/User/$username");
+
+      // If iOS simulator or a real device, might need 127.0.0.1 or your PC's IP:
+      // final url = Uri.parse("http://127.0.0.1:5175/api/User/$username");
+      // or "http://192.168.1.10:5175/api/User/$username";
+
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        // Parse JSON
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return User.fromJson(data);
+      } else {
+        // Handle non-200 responses
+        print("Failed to load user. Status code: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching user: $e");
+      return null;
+    }
+  }
+}
