@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mindtrack/constant/constant.dart';
-import 'package:mindtrack/firstpage.dart';
-import 'package:mindtrack/forgotpassword.dart';
 import 'package:mindtrack/home.dart';
 import 'package:mindtrack/main_screen.dart';
 import 'package:mindtrack/register.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   bool _obscureText = true;
@@ -81,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
             right: 0,
             child: Container(
               width: 300,
-              height: 400,
+              height: 345,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -91,7 +89,22 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment
+                    .center, // Ensures center alignment horizontally
                 children: [
+                  const Padding(
+                    padding: EdgeInsets.only(
+                        bottom: 40), // Spacing before the input section
+                    child: Text(
+                      "Please enter your email address \n to change your password",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter-VariableFont_opsz,wght',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(
@@ -118,59 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: MyColors.pink,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 0),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 35),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 15),
-                      child: Text(
-                        "Password",
-                        style: TextStyle(
-                          fontFamily: 'Inter-VariableFont_opsz,wght',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: 260,
-                    height: 35,
-                    child: TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscureText,
-                      textAlignVertical: TextAlignVertical.center,
-                      style: const TextStyle(
-                        fontFamily: 'Inter-VariableFont_opsz,wght',
-                      ),
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: MyColors.pink,
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 0),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            size: 16,
-                            color: MyColors.black,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 12),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -203,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       child: const Text(
-                        "Login",
+                        "Send Email",
                         style: TextStyle(
                           color: MyColors.black,
                           fontSize: 14,
@@ -211,37 +173,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontFamily: 'Inter-VariableFont_opsz,wght',
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const StartPage(),
-                        ),
-                      );
-                    },
-                    child: const Text.rich(
-                      TextSpan(
-                        text:
-                            "You don’t have an account \n or you forgot your password?\n",
-                        style: TextStyle(
-                          fontFamily: 'Inter-VariableFont_opsz,wght',
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Return to start page!",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Inter-VariableFont_opsz,wght',
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],

@@ -186,6 +186,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/firstpage.dart';
 import 'package:mindtrack/login.dart';
 
 void main() {
@@ -233,7 +234,7 @@ class MyApp extends StatelessWidget {
           labelStyle: TextStyle(color: MyColors.black),
         ),
       ),
-      home: const LoginScreen1(),
+      home: const StartPage(),
     );
   }
 }
