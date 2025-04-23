@@ -90,3 +90,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  assets:
+    - assets/icons/
+
+  fonts:
+    - family: Sansation
+      fonts:
+        - asset: assets/font/Inter-VariableFont_opsz,wght.ttf
