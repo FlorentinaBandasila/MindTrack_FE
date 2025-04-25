@@ -17,13 +17,16 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget getFragment(int index) {
     switch (index) {
       case 0:
-        return const HomeScreen();
+        return HomeScreen();
       case 1:
         return const HomeScreen();
       case 2:
         return const HomeScreen();
+      case 3:
+        return const HomeScreen();
+      default:
+        return const SizedBox.shrink();
     }
-    return const HomeScreen();
   }
 
   @override
