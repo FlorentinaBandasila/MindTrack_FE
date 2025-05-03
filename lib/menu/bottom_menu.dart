@@ -1,77 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/index.dart';
 
-class BottomMenu extends ConsumerStatefulWidget {
+class BottomMenu extends ConsumerWidget {
   const BottomMenu({super.key});
 
   @override
-  ConsumerState<BottomMenu> createState() => _BottomMenuState();
-}
-
-class _BottomMenuState extends ConsumerState<BottomMenu> {
-  final bottomNavigatorIndex = StateProvider<int>((ref) => 0);
-  void _onItemTapped(int index) {
-    ref.read(bottomNavigatorIndex.notifier).state = index;
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final int selectedIndex = ref.watch(bottomNavigatorIndex);
 
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      currentIndex: selectedIndex,
-      onTap: _onItemTapped,
-      backgroundColor: Colors.white,
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.black,
-      selectedLabelStyle:
-          const TextStyle(fontFamily: 'Inter-VariableFont_opsz,wght'),
-      unselectedLabelStyle:
-          const TextStyle(fontFamily: 'Inter-VariableFont_opsz,wght'),
-      items: [
-        BottomNavigationBarItem(
-          icon: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset("assets/icons/bell.png"),
-          ),
-          label: 'Bell',
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
+      child: Container(
+        height: 70,
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        BottomNavigationBarItem(
-          icon: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset("assets/icons/coffee.png"),
-          ),
-          label: 'Coffee',
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: List.generate(5, (index) {
+            final icons = [
+              "assets/icons/coffee.png",
+              "assets/icons/date.png",
+              "assets/icons/home.png",
+              "assets/icons/bell.png",
+              "assets/icons/account.png"
+            ];
+            final isSelected = index == selectedIndex;
+            return GestureDetector(
+              onTap: () {
+                ref.read(bottomNavigatorIndex.notifier).state = index;
+              },
+              child: SizedBox(
+                width: 50,
+                height: 50,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: isSelected ? Colors.black : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      icons[index],
+                      width: 35,
+                      height: 35,
+                      color: isSelected ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
         ),
-        BottomNavigationBarItem(
-          icon: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset("assets/icons/home.png"),
-          ),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset("assets/icons/date.png"),
-          ),
-          label: 'Date',
-        ),
-        BottomNavigationBarItem(
-          icon: SizedBox(
-            width: 24,
-            height: 24,
-            child: Image.asset("assets/icons/account.png"),
-          ),
-          label: 'Account',
-        ),
-      ],
+      ),
     );
   }
 }
