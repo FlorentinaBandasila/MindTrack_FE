@@ -98,7 +98,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Center(
                           child: Text(
                             isEditing ? 'Save' : 'Edit',
-                            style: const TextStyle(fontSize: 16),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Inter-VariableFont_opsz,wght',
+                            ),
                           ),
                         ),
                         Positioned(
@@ -114,28 +117,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                   width: 300,
                   height: 1,
-                  color: Colors.black,
+                  color: MyColors.black,
                 ),
                 _buildMenuItem(Icons.info, "About Us"),
                 const SizedBox(height: 4),
                 Container(
                   width: 300,
                   height: 1,
-                  color: Colors.black,
+                  color: MyColors.black,
                 ),
                 _buildMenuItem(Icons.settings, "Settings"),
                 const SizedBox(height: 4),
                 Container(
                   width: 300,
                   height: 1,
-                  color: Colors.black,
+                  color: MyColors.black,
                 ),
                 _buildMenuItem(Icons.logout, "Log Out"),
                 const SizedBox(height: 4),
                 Container(
                   width: 300,
                   height: 1,
-                  color: Colors.black,
+                  color: MyColors.black,
                 ),
 
                 const SizedBox(height: 94),
@@ -172,6 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               enabled: isEditable,
               style: const TextStyle(
                   fontSize: 12,
+                  fontFamily: 'Inter-VariableFont_opsz,wght',
                   color: MyColors.black,
                   fontWeight: FontWeight.bold),
               decoration: const InputDecoration(
@@ -199,15 +203,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(width: 12),
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   color: MyColors.black,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Inter-VariableFont_opsz,wght',
                   shadows: [
                     Shadow(
-                      offset: Offset(0, 2),
+                      offset: Offset(0, 1.5),
                       blurRadius: 2,
-                      color: Colors.black26,
+                      color: MyColors.black.withOpacity(0.4),
                     ),
                   ],
                 ),

@@ -6,6 +6,7 @@ import 'package:mindtrack/index.dart';
 import 'package:mindtrack/login.dart';
 import 'package:mindtrack/menu/bottom_menu.dart';
 import 'package:mindtrack/profile.dart';
+import 'package:mindtrack/questions.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -24,7 +25,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 2:
         return const HomeScreen();
       case 3:
-        return const ProfileScreen();
+        return const QuizPage();
       case 4:
         return const ProfileScreen();
       default:

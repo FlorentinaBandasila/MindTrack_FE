@@ -63,10 +63,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   color: MyColors.cream,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 16,
-                  color: MyColors.black,
+                child: Image.asset(
+                  'assets/icons/left_arrow.png',
+                  width: 24,
+                  height: 24,
                 ),
               ),
             ),
