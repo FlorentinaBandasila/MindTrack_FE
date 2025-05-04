@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mindtrack/article.dart';
 import 'package:mindtrack/home.dart';
 import 'package:mindtrack/index.dart';
 import 'package:mindtrack/login.dart';
@@ -19,9 +20,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget getFragment(int index) {
     switch (index) {
       case 0:
-        return HomeScreen();
+        return ArticlePage();
       case 1:
-        return const ProfileScreen();
+        return const HomeScreen();
       case 2:
         return const HomeScreen();
       case 3:
