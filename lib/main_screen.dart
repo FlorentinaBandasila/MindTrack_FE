@@ -22,9 +22,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 0:
         return ArticlePage();
       case 1:
-        return const HomeScreen();
+        return HomeScreen();
       case 2:
-        return const HomeScreen();
+        return HomeScreen();
       case 3:
         return const QuizPage();
       case 4:
@@ -37,17 +37,19 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedIndex = ref.watch(bottomNavigatorIndex);
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
           getFragment(selectedIndex),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: BottomMenu(),
-          ),
+          if (!isKeyboardOpen)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: BottomMenu(),
+            ),
         ],
       ),
     );
