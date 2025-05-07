@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindtrack/article.dart';
+import 'package:mindtrack/calendar.dart';
 import 'package:mindtrack/home.dart';
 import 'package:mindtrack/index.dart';
 import 'package:mindtrack/login.dart';
@@ -22,7 +23,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 0:
         return ArticlePage();
       case 1:
-        return HomeScreen();
+        return CalendarPage();
       case 2:
         return HomeScreen();
       case 3:
