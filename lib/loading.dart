@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/index.dart';
-import 'package:mindtrack/menu/bottom_menu.dart'; // pentru access la bottomNavigatorIndex
+import 'package:mindtrack/menu/bottom_menu.dart';
 
 class LoadingScreen extends ConsumerStatefulWidget {
   const LoadingScreen({super.key});
@@ -17,9 +17,8 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
   void initState() {
     super.initState();
 
-    // După 7 secunde, schimbă indexul în Riverpod
     Future.delayed(const Duration(seconds: 7), () {
-      ref.read(bottomNavigatorIndex.notifier).state = 2; // merge la HomeScreen
+      ref.read(bottomNavigatorIndex.notifier).state = 2;
     });
   }
 
