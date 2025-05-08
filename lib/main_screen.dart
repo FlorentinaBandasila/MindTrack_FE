@@ -10,6 +10,7 @@ import 'package:mindtrack/login.dart';
 import 'package:mindtrack/menu/bottom_menu.dart';
 import 'package:mindtrack/profile.dart';
 import 'package:mindtrack/questions.dart';
+import 'package:mindtrack/tasklist.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -28,7 +29,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 2:
         return HomeScreen();
       case 3:
-        return const LoadingScreen();
+        return const TaskPage();
       case 4:
         return const ProfileScreen();
       default:
