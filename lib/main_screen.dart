@@ -5,6 +5,7 @@ import 'package:mindtrack/article.dart';
 import 'package:mindtrack/calendar.dart';
 import 'package:mindtrack/home.dart';
 import 'package:mindtrack/index.dart';
+import 'package:mindtrack/loading.dart';
 import 'package:mindtrack/login.dart';
 import 'package:mindtrack/menu/bottom_menu.dart';
 import 'package:mindtrack/profile.dart';
@@ -27,7 +28,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 2:
         return HomeScreen();
       case 3:
-        return const QuizPage();
+        return const LoadingScreen();
       case 4:
         return const ProfileScreen();
       default:
