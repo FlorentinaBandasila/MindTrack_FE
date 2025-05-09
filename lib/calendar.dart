@@ -117,7 +117,7 @@ class _CalendarPageState extends State<CalendarPage> {
       backgroundColor: MyColors.grey,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.only(left: 8, top: 9, right: 8, bottom: 0),
+          padding: const EdgeInsets.only(left: 9, top: 9, right: 9, bottom: 0),
           child: Column(
             children: [
               const SizedBox(height: 26),
