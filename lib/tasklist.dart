@@ -16,6 +16,11 @@ class _TaskPageState extends State<TaskPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging == false) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -24,12 +29,50 @@ class _TaskPageState extends State<TaskPage>
     super.dispose();
   }
 
-  Widget _buildTaskCard(String title, String label, Color color, String date) {
+  Widget _buildTaskCard(
+      String title, String label, String date, String tabType) {
+    Color backgroundColor;
+    Color addColor;
+    Color labelColor;
+
+    // Fundalul întregului card
+    switch (tabType) {
+      case 'done':
+        backgroundColor = MyColors.lightblue;
+        addColor = MyColors.turqouise;
+        break;
+      case 'abandoned':
+        backgroundColor = MyColors.turqouise;
+        addColor = MyColors.lightblue;
+        break;
+      default:
+        backgroundColor = MyColors.cream;
+        addColor = MyColors.pink;
+    }
+
+    // Culoarea etichetei
+    switch (label.toLowerCase()) {
+      case 'low':
+        labelColor = MyColors.emojigreen;
+        break;
+      case 'medium':
+        labelColor = MyColors.emojiyellow;
+        break;
+      case 'high':
+        labelColor = MyColors.emojired;
+        break;
+      case 'recommended':
+        labelColor = MyColors.emojidarkblue;
+        break;
+      default:
+        labelColor = MyColors.black;
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: MyColors.cream,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(26),
         border: Border.all(color: MyColors.black, width: 2),
       ),
@@ -47,12 +90,16 @@ class _TaskPageState extends State<TaskPage>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                      color: color, borderRadius: BorderRadius.circular(12)),
-                  child: Text(label,
-                      style: const TextStyle(
-                          fontSize: 12,
-                          color: MyColors.black,
-                          fontWeight: FontWeight.w500)),
+                    color: labelColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                        fontSize: 12,
+                        color: MyColors.black,
+                        fontWeight: FontWeight.w500),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -72,12 +119,12 @@ class _TaskPageState extends State<TaskPage>
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: MyColors.pink,
+                  color: addColor,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
                       color: MyColors.black.withOpacity(0.5),
-                      offset: Offset(2, 2),
+                      offset: const Offset(2, 2),
                       blurRadius: 4,
                     ),
                   ],
@@ -94,114 +141,143 @@ class _TaskPageState extends State<TaskPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: MyColors.grey,
-        body: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Image.asset('assets/icons/tasksus.png'),
+      backgroundColor: MyColors.grey,
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topLeft,
+            child: Image.asset(
+              _tabController.index == 0
+                  ? 'assets/icons/tasksus.png'
+                  : 'assets/icons/taskrozsus.png',
             ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Image.asset('assets/icons/taskjos.png'),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Image.asset(
+              _tabController.index == 0
+                  ? 'assets/icons/taskjos.png'
+                  : 'assets/icons/taskrozjos.png',
             ),
-            SafeArea(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(
-                        left: 25, top: 30, right: 20, bottom: 15),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text("Daily Task List",
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold)),
-                    ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                const Padding(
+                  padding:
+                      EdgeInsets.only(left: 25, top: 30, right: 20, bottom: 15),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Daily Task List",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold)),
                   ),
-                  Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      Container(
-                        height: 40,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: MyColors.darkblue,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: MyColors.lightblue,
-                            width: 2,
-                          ),
+                ),
+                Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    Container(
+                      height: 40,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: MyColors.darkblue,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: MyColors.lightblue,
+                          width: 2,
                         ),
-                        child: IgnorePointer(
-                          child: TabBar(
-                            controller: _tabController,
-                            labelColor: MyColors.white,
-                            unselectedLabelColor: MyColors.black,
-                            isScrollable: false,
-                            indicator: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: MyColors.black,
-                            ),
-                            indicatorPadding: EdgeInsets.zero,
-                            labelPadding: EdgeInsets.zero,
-                            tabs: const [
-                              Tab(child: Center(child: Text("To Do"))),
-                              Tab(child: Center(child: Text("Done"))),
-                              Tab(child: Center(child: Text("Abandoned"))),
-                            ],
+                      ),
+                      child: IgnorePointer(
+                        child: TabBar(
+                          controller: _tabController,
+                          labelColor: MyColors.white,
+                          unselectedLabelColor: MyColors.black,
+                          isScrollable: false,
+                          indicator: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: MyColors.black,
                           ),
+                          indicatorPadding: EdgeInsets.zero,
+                          labelPadding: EdgeInsets.zero,
+                          tabs: const [
+                            Tab(child: Center(child: Text("To Do"))),
+                            Tab(child: Center(child: Text("Done"))),
+                            Tab(child: Center(child: Text("Abandoned"))),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      // To Do tab
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 140, top: 15),
+                        child: Column(
+                          children: [
+                            _buildTaskCard("School Project", "High",
+                                "28 Dec. 2024", "todo"),
+                            _buildTaskCard("Nature Walk", "Recommended",
+                                "27 Dec. 2024", "todo"),
+                            _buildTaskCard("Creative Activities", "Recommended",
+                                "25 Dec. 2024", "todo"),
+                            _buildTaskCard(
+                                "Gym", "Medium", "28 Nov. 2024", "todo"),
+                            _buildTaskCard(
+                                "Ride a Bike", "Low", "26 Nov. 2024", "todo"),
+                          ],
+                        ),
+                      ),
+
+                      // Done tab
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 140, top: 15),
+                        child: Column(
+                          children: [
+                            _buildTaskCard(
+                                "Read a Book", "Low", "28 Dec. 2024", "done"),
+                            _buildTaskCard(
+                                "Drink Water", "High", "27 Dec. 2024", "done"),
+                          ],
+                        ),
+                      ),
+
+                      // Abandoned tab
+                      SingleChildScrollView(
+                        padding: const EdgeInsets.only(bottom: 140, top: 15),
+                        child: Column(
+                          children: [
+                            _buildTaskCard("Study History", "High",
+                                "25 Dec. 2024", "abandoned"),
+                            _buildTaskCard("Meditation", "Recommended",
+                                "22 Dec. 2024", "abandoned"),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        SingleChildScrollView(
-                          padding: const EdgeInsets.only(bottom: 140, top: 15),
-                          child: Column(
-                            children: [
-                              _buildTaskCard("School Project", "High",
-                                  MyColors.emojired, "28 Dec. 2024"),
-                              _buildTaskCard("Nature Walk", "Recommended",
-                                  MyColors.emojidarkblue, "27 Dec. 2024"),
-                              _buildTaskCard(
-                                  "Creative Activities",
-                                  "Recommended",
-                                  MyColors.emojidarkblue,
-                                  "25 Dec. 2024"),
-                              _buildTaskCard("Gym", "Medium",
-                                  MyColors.emojiyellow, "28 Nov. 2024"),
-                              _buildTaskCard("Gym", "Medium",
-                                  MyColors.emojiyellow, "28 Nov. 2024"),
-                              _buildTaskCard("Gym", "Medium",
-                                  MyColors.emojiyellow, "28 Nov. 2024"),
-                            ],
-                          ),
-                        ),
-                        const Center(child: Text("Done tasks")),
-                        const Center(child: Text("Abandoned tasks")),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 90,
-              right: 20,
-              child: FloatingActionButton(
-                backgroundColor: MyColors.darkblue,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: MyColors.lightblue, width: 2),
                 ),
-                onPressed: () {},
-                child: const Icon(Icons.add, size: 32, color: MyColors.black),
-              ),
+              ],
             ),
-          ],
-        ));
+          ),
+          Positioned(
+            bottom: 90,
+            right: 20,
+            child: FloatingActionButton(
+              backgroundColor: MyColors.darkblue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: MyColors.lightblue, width: 2),
+              ),
+              onPressed: () {},
+              child: const Icon(Icons.add, size: 32, color: MyColors.black),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
