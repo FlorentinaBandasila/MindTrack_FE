@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/loading.dart';
 
 class Question {
   final String text;
@@ -18,6 +19,8 @@ class QuizPage extends StatefulWidget {
 class _QuizPageState extends State<QuizPage> {
   int currentQuestionIndex = 0;
   int? selectedIndex;
+
+  final List<int?> selectedAnswers = [];
 
   final List<Question> questions = [
     Question(
@@ -52,57 +55,72 @@ class _QuizPageState extends State<QuizPage> {
   Question get currentQuestion => questions[currentQuestionIndex];
 
   @override
+  void initState() {
+    super.initState();
+    selectedAnswers.addAll(List<int?>.filled(questions.length, null));
+  }
+
+  void saveResults() {
+    for (int i = 0; i < questions.length; i++) {
+      final question = questions[i];
+      final selected = selectedAnswers[i];
+      final answer =
+          selected != null ? question.answers[selected] : 'No answer';
+      print('Q${i + 1}: ${question.text}\nAnswer: $answer\n');
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LoadingScreen()),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.grey,
       body: Stack(
         children: [
-          // Top wave image
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: Image.asset('assets/icons/quizsus.png'),
           ),
-
-          // Bottom wave image
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Image.asset('assets/icons/quizjos.png'),
           ),
-
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Column(
                 children: [
-                  // Arrows
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (currentQuestionIndex > 0) {
-                              currentQuestionIndex--;
-                              selectedIndex = null;
-                            }
-                          });
-                        },
-                        child: CircleAvatar(
-                          radius: 17,
-                          backgroundColor: MyColors.cream,
-                          child: Image.asset(
-                            'assets/icons/left_arrow.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                        ),
-                      ),
-
-                      // Step indicator
+                      currentQuestionIndex > 0
+                          ? GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  currentQuestionIndex--;
+                                  selectedIndex =
+                                      selectedAnswers[currentQuestionIndex];
+                                });
+                              },
+                              child: CircleAvatar(
+                                radius: 24,
+                                backgroundColor: MyColors.cream,
+                                child: Image.asset(
+                                  'assets/icons/left_arrow.png',
+                                  width: 40,
+                                  height: 40,
+                                ),
+                              ),
+                            )
+                          : const SizedBox(width: 34),
                       Text(
                         '${currentQuestionIndex + 1} / ${questions.length}',
                         style: const TextStyle(
@@ -111,32 +129,31 @@ class _QuizPageState extends State<QuizPage> {
                           fontFamily: 'Inter-VariableFont_opsz,wght',
                         ),
                       ),
-
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (currentQuestionIndex < questions.length - 1) {
-                              currentQuestionIndex++;
-                              selectedIndex = null;
-                            }
-                          });
-                        },
-                        child: CircleAvatar(
-                          radius: 17,
-                          backgroundColor: MyColors.cream,
-                          child: Image.asset(
-                            'assets/icons/right_arrow.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                        ),
-                      ),
+                      currentQuestionIndex < questions.length - 1
+                          ? GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedAnswers[currentQuestionIndex] =
+                                      selectedIndex;
+                                  currentQuestionIndex++;
+                                  selectedIndex =
+                                      selectedAnswers[currentQuestionIndex];
+                                });
+                              },
+                              child: CircleAvatar(
+                                radius: 24,
+                                backgroundColor: MyColors.cream,
+                                child: Image.asset(
+                                  'assets/icons/right_arrow.png',
+                                  width: 40,
+                                  height: 40,
+                                ),
+                              ),
+                            )
+                          : const SizedBox(width: 34),
                     ],
                   ),
-
                   const SizedBox(height: 24),
-
-                  // Question box
                   Container(
                     width: 312,
                     height: 107,
@@ -161,9 +178,7 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 40),
-
                   ...List.generate(currentQuestion.answers.length, (index) {
                     final isSelected = index == selectedIndex;
 
@@ -171,11 +186,11 @@ class _QuizPageState extends State<QuizPage> {
                       onTap: () {
                         setState(() {
                           selectedIndex = index;
+                          selectedAnswers[currentQuestionIndex] = index;
                         });
                       },
                       child: Stack(
                         children: [
-                          // Base button
                           Container(
                             width: 285,
                             height: 46,
@@ -206,8 +221,6 @@ class _QuizPageState extends State<QuizPage> {
                               ),
                             ),
                           ),
-
-                          // Inner shadow overlay only if selected
                           if (isSelected)
                             Container(
                               width: 285,
@@ -230,6 +243,33 @@ class _QuizPageState extends State<QuizPage> {
                       ),
                     );
                   }),
+                  if (currentQuestionIndex == questions.length - 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 40),
+                      child: SizedBox(
+                        width: 140,
+                        child: ElevatedButton(
+                          onPressed: saveResults,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: MyColors.grey,
+                            foregroundColor: MyColors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              side:
+                                  BorderSide(color: MyColors.black, width: 1.5),
+                            ),
+                          ),
+                          child: const Text(
+                            'Save',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

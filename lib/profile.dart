@@ -29,22 +29,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             right: 0,
             child: Image.asset("assets/icons/fundal_profil.png"),
           ),
-
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Image.asset("assets/icons/linii_jos.png"),
-          ),
-
-          // Main content
           SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
             child: Column(
               children: [
                 const SizedBox(height: 49),
-
-                // Profile picture
                 Center(
                   child: Container(
                     width: 160,
@@ -60,8 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Input fields
                 _buildProfileField(
                     const Icon(Icons.person), nameController, isEditing),
                 _buildProfileField(
@@ -72,11 +59,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Image.asset("assets/icons/examination.png"),
                   moodController,
                   isEditing,
+                  alwaysReadOnly: true,
                 ),
-
                 const SizedBox(height: 16),
-
-                // Edit button
                 SizedBox(
                   width: 145,
                   height: 30,
@@ -112,7 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
                 Container(
                   width: 300,
@@ -140,8 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 2,
                   color: MyColors.black.withOpacity(0.5),
                 ),
-
-                const SizedBox(height: 94),
+                const SizedBox(height: 90),
               ],
             ),
           ),
@@ -151,7 +134,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileField(
-      Widget iconWidget, TextEditingController controller, bool isEditable) {
+      Widget iconWidget, TextEditingController controller, bool isEditable,
+      {bool alwaysReadOnly = false}) {
     return Container(
       width: 305,
       height: 40,
@@ -172,12 +156,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Expanded(
             child: TextField(
               controller: controller,
-              enabled: isEditable,
+              enabled: alwaysReadOnly ? false : isEditable,
               style: const TextStyle(
-                  fontSize: 12,
-                  fontFamily: 'Inter-VariableFont_opsz,wght',
-                  color: MyColors.black,
-                  fontWeight: FontWeight.bold),
+                fontSize: 12,
+                fontFamily: 'Inter-VariableFont_opsz,wght',
+                color: MyColors.black,
+                fontWeight: FontWeight.bold,
+              ),
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 isDense: true,

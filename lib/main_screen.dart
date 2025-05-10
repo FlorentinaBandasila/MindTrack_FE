@@ -33,7 +33,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       case 4:
         return const ProfileScreen();
       default:
-        return const SizedBox.shrink();
+        return HomeScreen();
     }
   }
 

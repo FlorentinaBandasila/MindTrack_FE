@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/home.dart';
+import 'package:mindtrack/login.dart';
 import 'package:mindtrack/main_screen.dart';
+import 'package:mindtrack/questions.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,10 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Gray background
           Container(color: MyColors.grey),
-
-          // Top wave
           Positioned(
             top: 0,
             left: 0,
@@ -36,8 +35,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Bottom wave
           Positioned(
             bottom: 0,
             left: 0,
@@ -47,8 +44,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Back arrow circle
           Positioned(
             top: 40,
             left: 20,
@@ -71,7 +66,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
-
           Positioned(
             top: MediaQuery.of(context).size.height * 0.18,
             left: 0,
@@ -345,7 +339,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MainScreen(),
+                              builder: (context) => const QuizPage(),
                             ),
                           );
                         }

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/home.dart';
 import 'package:mindtrack/index.dart';
+import 'package:mindtrack/main_screen.dart';
 import 'package:mindtrack/menu/bottom_menu.dart';
 
 class LoadingScreen extends ConsumerStatefulWidget {
@@ -19,6 +21,11 @@ class _LoadingScreenState extends ConsumerState<LoadingScreen> {
 
     Future.delayed(const Duration(seconds: 7), () {
       ref.read(bottomNavigatorIndex.notifier).state = 2;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()),
+      );
     });
   }
 
