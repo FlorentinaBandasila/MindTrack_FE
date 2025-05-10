@@ -26,10 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Gray background
           Container(color: MyColors.grey),
-
-          // Top wave
           Positioned(
             top: 0,
             left: 0,
@@ -39,8 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Bottom wave
           Positioned(
             bottom: 0,
             left: 0,
@@ -50,8 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Back arrow circle
           Positioned(
             top: 40,
             left: 20,
@@ -74,7 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-
           Positioned(
             top: MediaQuery.of(context).size.height * 0.18,
             left: 0,

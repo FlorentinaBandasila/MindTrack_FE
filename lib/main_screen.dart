@@ -13,13 +13,25 @@ import 'package:mindtrack/questions.dart';
 import 'package:mindtrack/tasklist.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
-  const MainScreen({super.key});
+  final int initialIndex;
+  const MainScreen({super.key, this.initialIndex = 2});
 
   @override
   ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    Future.microtask(() {
+      ref.read(bottomNavigatorIndex.notifier).state = _currentIndex;
+    });
+  }
+
   Widget getFragment(int index) {
     switch (index) {
       case 0:
@@ -41,6 +53,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   Widget build(BuildContext context) {
     final selectedIndex = ref.watch(bottomNavigatorIndex);
     final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
