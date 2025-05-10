@@ -64,10 +64,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   color: MyColors.cream,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 16,
-                  color: MyColors.black,
+                child: Image.asset(
+                  'assets/icons/left_arrow.png',
+                  width: 24,
+                  height: 24,
                 ),
               ),
             ),
@@ -142,8 +142,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   const SizedBox(height: 35),
                   SizedBox(
-                    width: 120,
-                    height: 25,
+                    width: 130,
+                    height: 30,
                     child: ElevatedButton(
                       onPressed: () {
                         if (_usernameController.text.isEmpty &&

@@ -336,8 +336,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 35),
                   SizedBox(
-                    width: 120,
-                    height: 25,
+                    width: 130,
+                    height: 30,
                     child: ElevatedButton(
                       onPressed: () {
                         if (_usernameController.text.isEmpty &&

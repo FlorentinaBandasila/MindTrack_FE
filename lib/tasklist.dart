@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mindtrack/add_task.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/details_popup.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
@@ -35,7 +37,6 @@ class _TaskPageState extends State<TaskPage>
     Color addColor;
     Color labelColor;
 
-    // Fundalul întregului card
     switch (tabType) {
       case 'done':
         backgroundColor = MyColors.lightblue;
@@ -50,7 +51,6 @@ class _TaskPageState extends State<TaskPage>
         addColor = MyColors.pink;
     }
 
-    // Culoarea etichetei
     switch (label.toLowerCase()) {
       case 'low':
         labelColor = MyColors.emojigreen;
@@ -112,26 +112,35 @@ class _TaskPageState extends State<TaskPage>
               ],
             ),
           ),
-          Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: addColor,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: MyColors.black.withOpacity(0.5),
-                      offset: const Offset(2, 2),
-                      blurRadius: 4,
-                    ),
-                  ],
+          GestureDetector(
+            onTap: () {
+              showTaskOptionsPopup(
+                context,
+                title,
+                'Descriptive text here...',
+              );
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: addColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: MyColors.black.withOpacity(0.5),
+                        offset: const Offset(2, 2),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const Icon(Icons.more_horiz, color: MyColors.black),
-            ],
+                const Icon(Icons.more_horiz, color: MyColors.black),
+              ],
+            ),
           ),
         ],
       ),
@@ -150,14 +159,6 @@ class _TaskPageState extends State<TaskPage>
               _tabController.index == 0
                   ? 'assets/icons/tasksus.png'
                   : 'assets/icons/taskrozsus.png',
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Image.asset(
-              _tabController.index == 0
-                  ? 'assets/icons/taskjos.png'
-                  : 'assets/icons/taskrozjos.png',
             ),
           ),
           SafeArea(
@@ -272,7 +273,7 @@ class _TaskPageState extends State<TaskPage>
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(color: MyColors.lightblue, width: 2),
               ),
-              onPressed: () {},
+              onPressed: () => showAddTaskDialog(context),
               child: const Icon(Icons.add, size: 32, color: MyColors.black),
             ),
           ),
