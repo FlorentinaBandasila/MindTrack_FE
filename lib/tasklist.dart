@@ -115,10 +115,7 @@ class _TaskPageState extends State<TaskPage>
           GestureDetector(
             onTap: () {
               showTaskOptionsPopup(
-                context,
-                title,
-                'Descriptive text here...',
-              );
+                  context, title, "Descriptive text here", tabType);
             },
             child: Stack(
               alignment: Alignment.center,
