@@ -18,9 +18,9 @@ class UserModel {
       username: json['username'],
       email: json['email'],
       phone: json['phone'],
-      fullname: json['fullanme'],
+      fullname: json['full_name'],
       createdAt:
-          json['created'] != null ? DateTime.parse(json['created']) : null,
+          json['created'] != null ? DateTime.tryParse(json['created']) : null,
     );
   }
 }
