@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/apilogin.dart';
 import 'package:mindtrack/firstpage.dart';
 import 'package:mindtrack/forgotpassword.dart';
 import 'package:mindtrack/home.dart';
@@ -176,15 +177,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 30,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_usernameController.text.isEmpty &&
-                            _passwordController.text.isEmpty) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainScreen(),
-                            ),
-                          );
-                        }
+                        final username = _usernameController.text;
+                        final password = _passwordController.text;
+
+                        login(context, username, password);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: MyColors.grey,
