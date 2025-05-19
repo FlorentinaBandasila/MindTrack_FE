@@ -3,7 +3,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/editavatar.dart';
+import 'package:mindtrack/endpoint/edituser.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
+import 'package:mindtrack/models/avatars.dart';
 import 'package:mindtrack/models/usermodel.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -17,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isEditing = false;
   bool _isLoading = true;
   UserModel? _user;
+  String? selectedAvatar;
 
   final nameController = TextEditingController();
   final emailController = TextEditingController();
@@ -39,9 +43,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
         phoneController.text = user.phone ?? "";
         moodController.text = null ?? "Unknown";
         _isLoading = false;
+        selectedAvatar = user.avatar;
       });
     } else {
       setState(() => _isLoading = false);
+    }
+    if (selectedAvatar == "") selectedAvatar = avatarList.first;
+  }
+
+  Future<void> _handleAvatarChange(String avatar) async {
+    final success = await updateAvatar(avatar);
+
+    if (success) {
+      await _loadUser();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update avatar')),
+      );
     }
   }
 
@@ -65,17 +83,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 49),
-                      Center(
-                        child: Container(
-                          width: 160,
-                          height: 160,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border:
-                                Border.all(color: MyColors.lightblue, width: 6),
-                            image: const DecorationImage(
-                              image: AssetImage("assets/icons/sisi.png"),
-                              fit: BoxFit.cover,
+                      GestureDetector(
+                        onTap: _showAvatarPicker,
+                        child: Center(
+                          child: Container(
+                            width: 160,
+                            height: 160,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: MyColors.lightblue, width: 6),
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    "assets/avatars/${selectedAvatar ?? avatarList.first}"),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
@@ -98,7 +120,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: 145,
                         height: 30,
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            if (isEditing) {
+                              List<Map<String, dynamic>> patchOps = [];
+
+                              if (nameController.text != _user?.fullname) {
+                                patchOps.add({
+                                  "op": "replace",
+                                  "path": "/fullname",
+                                  "value": nameController.text,
+                                });
+                              }
+
+                              if (emailController.text != _user?.email) {
+                                patchOps.add({
+                                  "op": "replace",
+                                  "path": "/email",
+                                  "value": emailController.text,
+                                });
+                              }
+
+                              if (phoneController.text != _user?.phone) {
+                                patchOps.add({
+                                  "op": "replace",
+                                  "path": "/phone",
+                                  "value": phoneController.text,
+                                });
+                              }
+
+                              await patchUser(patchOps);
+                              await _loadUser();
+                            }
+
                             setState(() => isEditing = !isEditing);
                           },
                           style: ElevatedButton.styleFrom(
@@ -241,6 +294,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showAvatarPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          color: MyColors.lightblue,
+          padding: const EdgeInsets.all(16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            itemCount: avatarList.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
+            itemBuilder: (context, index) {
+              final avatar = avatarList[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleAvatarChange(avatar);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: selectedAvatar == avatar
+                        ? Border.all(color: Colors.green, width: 3)
+                        : null,
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/avatars/$avatar',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

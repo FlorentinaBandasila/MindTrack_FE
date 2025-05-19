@@ -40,6 +40,7 @@ dependencies:
   lottie: ^3.3.1
   table_calendar: ^3.2.0
   flutter_secure_storage: ^9.2.4
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -103,6 +104,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/animations/
+    - assets/avatars/
 
   fonts:
     - family: Sansation
