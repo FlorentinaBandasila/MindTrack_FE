@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 
 import 'package:mindtrack/constant/constant.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:mindtrack/endpoint/getemotionschart.dart';
+import 'package:mindtrack/models/emotionschartmodel.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -46,6 +51,41 @@ class _CalendarPageState extends State<CalendarPage> {
     '2024-12-26': 'calm',
     '2025-02-15': 'angry',
   };
+
+  Map<String, int> emojiStats = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchEmojiStats();
+  }
+
+  Future<void> _fetchEmojiStats() async {
+    try {
+      final data = await getEmotionschart();
+
+      final Map<String, int> stats = {
+        'happy': 0,
+        'calm': 0,
+        'sad': 0,
+        'angry': 0,
+        'satisfied': 0,
+        'stressed': 0,
+      };
+
+      for (var item in data) {
+        if (item != null && stats.containsKey(item.moodName)) {
+          stats[item.moodName] = item.count;
+        }
+      }
+
+      setState(() {
+        emojiStats = stats;
+      });
+    } catch (e) {
+      print('Error fetching emoji stats: $e');
+    }
+  }
 
   void _changeMonth(int offset) {
     setState(() {
@@ -93,25 +133,45 @@ class _CalendarPageState extends State<CalendarPage> {
     return dayTiles;
   }
 
-  Map<String, int> _calculateEmojiStats() {
-    final stats = <String, int>{};
-    for (var emoji in emojiMap.keys) {
-      stats[emoji] = 0;
-    }
+  final barColors = [
+    MyColors.emojiyellow,
+    MyColors.emojigreen,
+    MyColors.emojilightblue,
+    MyColors.emojired,
+    MyColors.emojidarkblue,
+    MyColors.emojipurple,
+  ];
 
-    mockEmotions.forEach((date, emoji) {
-      final dt = DateTime.parse(date);
-      if (dt.month == currentMonth.month && dt.year == currentMonth.year) {
-        stats[emoji] = (stats[emoji] ?? 0) + 1;
-      }
-    });
-
-    return stats;
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return months[month - 1];
   }
 
   @override
   Widget build(BuildContext context) {
-    final stats = _calculateEmojiStats();
+    final stats = emojiStats.isEmpty
+        ? {
+            'happy': 0,
+            'calm': 0,
+            'sad': 0,
+            'angry': 0,
+            'satisfied': 0,
+            'stressed': 0,
+          }
+        : emojiStats;
 
     return Scaffold(
       backgroundColor: MyColors.grey,
@@ -292,7 +352,6 @@ class _CalendarPageState extends State<CalendarPage> {
                                 .asMap()
                                 .entries
                                 .map((entryWithIndex) {
-                              final index = entryWithIndex.key;
                               final entry = entryWithIndex.value;
 
                               return Column(
@@ -314,32 +373,5 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
       ),
     );
-  }
-
-  final barColors = [
-    MyColors.emojiyellow,
-    MyColors.emojigreen,
-    MyColors.emojilightblue,
-    MyColors.emojired,
-    MyColors.emojidarkblue,
-    MyColors.emojipurple,
-  ];
-
-  String _monthName(int month) {
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December'
-    ];
-    return months[month - 1];
   }
 }
