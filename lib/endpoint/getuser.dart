@@ -5,7 +5,7 @@ import 'package:mindtrack/models/usermodel.dart';
 
 final FlutterSecureStorage storage = FlutterSecureStorage();
 
-Future<UserModel?> fetchUser() async {
+Future<UserModel?> getUser() async {
   final token = await storage.read(key: 'token');
   if (token == null) return null;
 

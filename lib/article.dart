@@ -1,39 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/getarticle.dart';
+import 'package:mindtrack/models/articlemodel.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class ArticlePage extends StatelessWidget {
+class ArticlePage extends StatefulWidget {
   const ArticlePage({super.key});
 
-  final List<Map<String, String>> mockArticles = const [
-    {
-      'title': 'Understanding Anxiety',
-      'image': 'assets/icons/articole1.png',
-    },
-    {
-      'title': 'Dealing with Depression',
-      'image': 'assets/icons/articole1.png',
-    },
-    {
-      'title': 'Daily Mindfulness Tips',
-      'image': 'assets/icons/articole1.png',
-    },
-    {
-      'title': 'Men\'s Mental Health',
-      'image': 'assets/icons/articole1.png',
-    },
-    {
-      'title': 'Overcoming Burnout',
-      'image': 'assets/icons/articole1.png',
-    },
-    {
-      'title': 'Overcoming Burnout',
-      'image': 'assets/icons/articole1.png',
-    },
-    {
-      'title': 'Overcoming Burnout',
-      'image': 'assets/icons/articole1.png',
-    },
-  ];
+  @override
+  State<ArticlePage> createState() => _ArticlePageState();
+}
+
+class _ArticlePageState extends State<ArticlePage> {
+  bool _isLoading = true;
+  List<ArticleModel> _articles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadArticles();
+  }
+
+  Future<void> _loadArticles() async {
+    final articles = await getArticle();
+    if (articles != null && articles is List<ArticleModel>) {
+      setState(() {
+        _articles = articles;
+        _isLoading = false;
+      });
+    } else {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _openLink(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri != null && await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not launch the URL')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +77,6 @@ class ArticlePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Section title box
                       Center(
                         child: Container(
                           width: 260,
@@ -88,61 +96,68 @@ class ArticlePage extends StatelessWidget {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 40),
-
-                      ListView.separated(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: mockArticles.length,
-                        separatorBuilder: (_, __) => const Column(
-                          children: [
-                            SizedBox(height: 16),
-                            Divider(color: MyColors.black),
-                            SizedBox(height: 16),
-                          ],
-                        ),
-                        itemBuilder: (context, index) {
-                          final article = mockArticles[index];
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      if (_isLoading)
+                        const Center(child: CircularProgressIndicator())
+                      else
+                        ListView.separated(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: _articles.length,
+                          separatorBuilder: (_, __) => const Column(
                             children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 12),
-                                  child: Text(
-                                    article['title'] ?? 'Titlu articol',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      fontFamily:
-                                          'Inter-VariableFont_opsz,wght',
+                              SizedBox(height: 16),
+                              Divider(color: MyColors.black),
+                              SizedBox(height: 16),
+                            ],
+                          ),
+                          itemBuilder: (context, index) {
+                            final article = _articles[index];
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      if (article.link != null) {
+                                        _openLink(article.link!);
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: Text(
+                                        article.title ?? 'Titlu articol',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily:
+                                              'Inter-VariableFont_opsz,wght',
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-
-                              // Article image
-                              Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  color: MyColors.lightblue,
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(9),
-                                  child: Image.asset(
-                                    article['image']!,
-                                    width: 130,
-                                    height: 80,
-                                    fit: BoxFit.cover,
+                                Container(
+                                  padding: const EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    color: MyColors.lightblue,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(9),
+                                    child: Image.asset(
+                                      'assets/articlephotos/${article.photo}',
+                                      width: 130,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                              ],
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ),
