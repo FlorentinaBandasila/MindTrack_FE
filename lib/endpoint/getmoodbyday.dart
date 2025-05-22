@@ -1,11 +1,11 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:mindtrack/models/emotionschartmodel.dart';
+import 'package:mindtrack/models/moodbydaymodel.dart';
 
 final FlutterSecureStorage storage = FlutterSecureStorage();
 
-Future<List<EmotionschartModel>> getEmotionschart(int year, int month) async {
+Future<List<MoodByDayModel?>> getmoodbyday(int year, int month) async {
   final token = await storage.read(key: 'token');
 
   final payload = jsonDecode(
@@ -14,10 +14,10 @@ Future<List<EmotionschartModel>> getEmotionschart(int year, int month) async {
 
   final userId = payload[
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+  print('UserId from token: $userId');
 
   final url = Uri.parse(
-      'http://localhost:5175/api/Emotion/user/$userId/mood-chart?year=$year&month=$month');
-
+      'http://localhost:5175/api/Emotion/user/$userId/by-day?year=$year&month=$month');
   final response = await http.get(
     url,
     headers: {'Authorization': 'Bearer $token'},
@@ -25,8 +25,8 @@ Future<List<EmotionschartModel>> getEmotionschart(int year, int month) async {
 
   if (response.statusCode == 200) {
     final List<dynamic> data = json.decode(response.body);
-    return data.map((item) => EmotionschartModel.fromJson(item)).toList();
+    return data.map((item) => MoodByDayModel.fromJson(item)).toList();
   } else {
-    throw Exception('Failed to load emoji stats');
+    throw Exception('Failed to load mood');
   }
 }

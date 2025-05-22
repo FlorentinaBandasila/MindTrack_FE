@@ -6,7 +6,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mindtrack/endpoint/getemotionschart.dart';
+import 'package:mindtrack/endpoint/getmoodbyday.dart';
 import 'package:mindtrack/models/emotionschartmodel.dart';
+import 'package:mindtrack/models/moodbydaymodel.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -16,7 +18,7 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  DateTime currentMonth = DateTime(2024, 12);
+  DateTime currentMonth = DateTime.now();
   final Map<String, String> emojiMap = {
     'happy': 'assets/icons/happy.png',
     'calm': 'assets/icons/calm.png',
@@ -26,31 +28,8 @@ class _CalendarPageState extends State<CalendarPage> {
     'stressed': 'assets/icons/stressed.png',
   };
 
-  final Map<String, String> mockEmotions = {
-    '2024-12-01': 'angry',
-    '2024-12-02': 'stressed',
-    '2024-12-03': 'sad',
-    '2024-12-04': 'calm',
-    '2024-12-05': 'happy',
-    '2024-12-06': 'calm',
-    '2024-12-11': 'calm',
-    '2024-12-12': 'calm',
-    '2024-12-14': 'calm',
-    '2024-12-16': 'calm',
-    '2024-12-17': 'calm',
-    '2024-12-07': 'sad',
-    '2024-12-08': 'satisfied',
-    '2024-12-09': 'satisfied',
-    '2024-12-10': 'happy',
-    '2024-12-13': 'angry',
-    '2024-12-15': 'sad',
-    '2024-12-20': 'calm',
-    '2024-12-25': 'sad',
-    '2024-12-29': 'angry',
-    '2024-12-23': 'calm',
-    '2024-12-26': 'calm',
-    '2025-02-15': 'angry',
-  };
+  List<MoodByDayModel> _moods = [];
+  bool _isLoading = true;
 
   Map<String, int> emojiStats = {};
 
@@ -58,11 +37,56 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _fetchEmojiStats();
+    _fetchMoods();
+  }
+
+  Future<void> _fetchMoods() async {
+    try {
+      final allMoods =
+          await getmoodbyday(currentMonth.year, currentMonth.month);
+      if (allMoods != null) {
+        final filtered = allMoods
+            .where((m) {
+              final d = m?.date;
+              return d != null &&
+                  d.year == currentMonth.year &&
+                  d.month == currentMonth.month;
+            })
+            .cast<MoodByDayModel>()
+            .toList();
+
+        setState(() {
+          _moods = filtered;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching moods: $e');
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Map<String, String> _generateMoodMap() {
+    final Map<String, String> moodMap = {};
+
+    for (var mood in _moods) {
+      final date = mood.date;
+      if (date != null &&
+          date.year == currentMonth.year &&
+          date.month == currentMonth.month) {
+        final key =
+            "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+        moodMap.putIfAbsent(key, () => mood.mood_Name);
+      }
+    }
+
+    return moodMap;
   }
 
   Future<void> _fetchEmojiStats() async {
     try {
-      final data = await getEmotionschart();
+      final data =
+          await getEmotionschart(currentMonth.year, currentMonth.month);
 
       final Map<String, int> stats = {
         'happy': 0,
@@ -90,7 +114,11 @@ class _CalendarPageState extends State<CalendarPage> {
   void _changeMonth(int offset) {
     setState(() {
       currentMonth = DateTime(currentMonth.year, currentMonth.month + offset);
+      _isLoading = true;
     });
+
+    _fetchMoods();
+    _fetchEmojiStats();
   }
 
   List<Widget> _buildCalendar() {
@@ -99,6 +127,7 @@ class _CalendarPageState extends State<CalendarPage> {
     final firstWeekday =
         DateTime(currentMonth.year, currentMonth.month, 1).weekday;
     final dayTiles = <Widget>[];
+    final moodMap = _generateMoodMap();
 
     for (int i = 1; i < firstWeekday; i++) {
       dayTiles.add(const SizedBox());
@@ -107,12 +136,13 @@ class _CalendarPageState extends State<CalendarPage> {
     for (int day = 1; day <= daysInMonth; day++) {
       final key =
           "${currentMonth.year}-${currentMonth.month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}";
-      final emoji = mockEmotions[key];
+      final emoji = moodMap[key];
+
       dayTiles.add(
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            emoji != null
+            emoji != null && emojiMap.containsKey(emoji)
                 ? Image.asset(
                     emojiMap[emoji]!,
                     width: 24,

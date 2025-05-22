@@ -26,8 +26,8 @@ Future<void> login(
       utf8.decode(base64Url.decode(base64Url.normalize(token.split('.')[1]))),
     );
 
-    final userId = payload['nameid'];
-    final usernameFromToken = payload['unique_name'];
+    final userId = payload['nameidentifier'];
+    final usernameFromToken = payload['name'];
 
     print('Logged in as: $usernameFromToken ($userId)');
 
