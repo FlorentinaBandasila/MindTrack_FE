@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import 'package:mindtrack/constant/constant.dart';
-import 'package:mindtrack/home.dart';
-import 'package:mindtrack/login.dart';
-import 'package:mindtrack/main_screen.dart';
+import 'package:mindtrack/endpoint/registeruser.dart';
 import 'package:mindtrack/questions.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -14,8 +11,14 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _full_nameController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  bool isChecked = false;
   bool _obscureText = true;
 
   @override
@@ -101,7 +104,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 260,
                     height: 35,
                     child: TextFormField(
-                      controller: _usernameController,
+                      controller: _full_nameController,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
                         fontFamily: 'Inter-VariableFont_opsz,wght',
@@ -173,7 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 260,
                     height: 35,
                     child: TextFormField(
-                      controller: _usernameController,
+                      controller: _emailController,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
                         fontFamily: 'Inter-VariableFont_opsz,wght',
@@ -209,7 +212,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 260,
                     height: 35,
                     child: TextFormField(
-                      controller: _usernameController,
+                      controller: _phoneController,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
                         fontFamily: 'Inter-VariableFont_opsz,wght',
@@ -296,7 +299,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 260,
                     height: 35,
                     child: TextFormField(
-                      controller: _passwordController,
+                      controller: _confirmPasswordController,
                       obscureText: _obscureText,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
@@ -334,15 +337,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 30,
                     child: ElevatedButton(
                       onPressed: () {
-                        if (_usernameController.text.isEmpty &&
-                            _passwordController.text.isEmpty) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const QuizPage(),
-                            ),
+                        final username = _usernameController.text.trim();
+                        final password = _passwordController.text.trim();
+                        final confirmPassword =
+                            _confirmPasswordController.text.trim();
+                        final email = _emailController.text.trim();
+                        final phone = _phoneController.text.trim();
+                        final full_name = _full_nameController.text.trim();
+
+                        if (password != confirmPassword) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: const Text('Error'),
+                                content: const Text(
+                                  'Passwords do not match!',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(
+                                        context,
+                                      ).pop();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              );
+                            },
                           );
+                          return;
                         }
+
+                        registerUser(
+                          context,
+                          username,
+                          password,
+                          email,
+                          phone,
+                          full_name,
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: MyColors.grey,
