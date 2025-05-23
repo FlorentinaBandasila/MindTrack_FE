@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mindtrack/endpoint/apilogin.dart';
 import 'package:mindtrack/login.dart';
 import 'package:mindtrack/questions.dart';
 
@@ -34,6 +35,7 @@ Future<void> registerUser(
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Account created successfully!')));
+      await login(context, username, password);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const QuizPage()),
