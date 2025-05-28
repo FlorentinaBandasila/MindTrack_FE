@@ -16,7 +16,7 @@ Future<List<EmotionschartModel>> getEmotionschart(int year, int month) async {
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 
   final url = Uri.parse(
-      'http://localhost:5175/api/Emotion/user/$userId/mood-chart?year=$year&month=$month');
+      'http://192.168.1.133:5000/api/Emotion/user/$userId/mood-chart?year=$year&month=$month');
 
   final response = await http.get(
     url,

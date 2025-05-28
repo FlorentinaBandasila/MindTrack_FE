@@ -17,7 +17,7 @@ Future<UserModel?> getUser() async {
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
   print('UserId from token: $userId');
 
-  final url = Uri.parse('http://localhost:5175/api/User/$userId');
+  final url = Uri.parse('http://192.168.1.133:5000/api/User/$userId');
   final response = await http.get(
     url,
     headers: {'Authorization': 'Bearer $token'},

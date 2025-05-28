@@ -1,3 +1,16 @@
+// Top‐level build.gradle
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // <-- THIS is where the plugin classpath belongs
+        classpath "com.android.tools.build:gradle:8.2.1"
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -8,9 +21,7 @@ allprojects {
 rootProject.buildDir = "../build"
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
-    project.evaluationDependsOn(":app")
+    // Many Flutter projects also do: evaluationDependsOn(":app")
 }
 
 tasks.register("clean", Delete) {

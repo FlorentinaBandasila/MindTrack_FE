@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/getquiz.dart';
 import 'package:mindtrack/loading.dart';
+import 'package:mindtrack/models/quizmodel.dart';
 
 class Question {
   final String text;
@@ -22,51 +24,41 @@ class _QuizPageState extends State<QuizPage> {
 
   final List<int?> selectedAnswers = [];
 
-  final List<Question> questions = [
-    Question(
-      text: "How often do you feel nervous or anxious?",
-      answers: [
-        "a) Never",
-        "b) Sometimes",
-        "c) Often",
-        "d) Always",
-      ],
-    ),
-    Question(
-      text: "How often do you feel hopeless or down?",
-      answers: [
-        "a) Never",
-        "b) Occasionally",
-        "c) Frequently",
-        "d) Constantly",
-      ],
-    ),
-    Question(
-      text: "How well do you sleep at night?",
-      answers: [
-        "a) Very well",
-        "b) Fairly well",
-        "c) Poorly",
-        "d) Not at all",
-      ],
-    ),
-  ];
+  List<QuestionModel> questions = [];
 
-  Question get currentQuestion => questions[currentQuestionIndex];
+  QuestionModel get currentQuestion => questions[currentQuestionIndex];
 
   @override
   void initState() {
     super.initState();
-    selectedAnswers.addAll(List<int?>.filled(questions.length, null));
+    loadQuestions();
+  }
+
+  Future<void> loadQuestions() async {
+    try {
+      final fetchedQuestions = await fetchQuiz();
+      setState(() {
+        questions = fetchedQuestions;
+        selectedAnswers.addAll(List<int?>.filled(questions.length, null));
+      });
+    } catch (e) {
+      print('Error loading quiz: $e');
+    }
   }
 
   void saveResults() {
     for (int i = 0; i < questions.length; i++) {
       final question = questions[i];
       final selected = selectedAnswers[i];
-      final answer =
-          selected != null ? question.answers[selected] : 'No answer';
-      print('Q${i + 1}: ${question.text}\nAnswer: $answer\n');
+      final answer = selected != null ? question.answers[selected] : null;
+
+      print('Q${i + 1}: ${question.title}');
+      if (answer != null) {
+        print(
+            'Answer: ${answer.text} (Points: ${answer.points}, ID: ${answer.id})\n');
+      } else {
+        print('Answer: No answer\n');
+      }
     }
 
     Navigator.push(
@@ -168,7 +160,7 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                     child: Center(
                       child: Text(
-                        currentQuestion.text,
+                        currentQuestion.title,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 18,
@@ -180,6 +172,7 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   const SizedBox(height: 40),
                   ...List.generate(currentQuestion.answers.length, (index) {
+                    final answer = currentQuestion.answers[index];
                     final isSelected = index == selectedIndex;
 
                     return GestureDetector(
@@ -211,7 +204,7 @@ class _QuizPageState extends State<QuizPage> {
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 15),
                                 child: Text(
-                                  currentQuestion.answers[index],
+                                  answer.text, // AICI: afișăm answer.text
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontFamily: 'Inter-VariableFont_opsz,wght',
