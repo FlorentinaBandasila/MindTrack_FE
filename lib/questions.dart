@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/endpoint/getquiz.dart';
+import 'package:mindtrack/endpoint/takequiz.dart';
 import 'package:mindtrack/loading.dart';
 import 'package:mindtrack/models/quizmodel.dart';
 
@@ -25,8 +26,10 @@ class _QuizPageState extends State<QuizPage> {
   final List<int?> selectedAnswers = [];
 
   List<QuestionModel> questions = [];
+  bool _isLoadingQuestions = true;
 
-  QuestionModel get currentQuestion => questions[currentQuestionIndex];
+  QuestionModel? get currentQuestion =>
+      questions.isNotEmpty ? questions[currentQuestionIndex] : null;
 
   @override
   void initState() {
@@ -46,19 +49,15 @@ class _QuizPageState extends State<QuizPage> {
     }
   }
 
-  void saveResults() {
-    for (int i = 0; i < questions.length; i++) {
-      final question = questions[i];
-      final selected = selectedAnswers[i];
-      final answer = selected != null ? question.answers[selected] : null;
+  void saveResults() async {
+    final result = await submitQuizAnswers(questions, selectedAnswers);
 
-      print('Q${i + 1}: ${question.title}');
-      if (answer != null) {
-        print(
-            'Answer: ${answer.text} (Points: ${answer.points}, ID: ${answer.id})\n');
-      } else {
-        print('Answer: No answer\n');
-      }
+    if (result != null) {
+      print("Quiz submitted successfully:");
+      print("Result ID: ${result['quizResult_id']}");
+      print("Points: ${result['points']}");
+      print("Title: ${result['title']}");
+      print("Date: ${result['date']}");
     }
 
     Navigator.push(
@@ -69,6 +68,28 @@ class _QuizPageState extends State<QuizPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingQuestions) {
+      return const Scaffold(
+        backgroundColor: MyColors.grey,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (questions.isEmpty) {
+      return const Scaffold(
+        backgroundColor: MyColors.grey,
+        body: Center(child: Text("No questions available.")),
+      );
+    }
+
+    final question = currentQuestion;
+    if (question == null) {
+      return const Scaffold(
+        backgroundColor: MyColors.grey,
+        body: Center(child: Text("Loading question...")),
+      );
+    }
+
     return Scaffold(
       backgroundColor: MyColors.grey,
       body: Stack(
@@ -160,7 +181,7 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                     child: Center(
                       child: Text(
-                        currentQuestion.title,
+                        currentQuestion!.title,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 18,
@@ -171,8 +192,8 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  ...List.generate(currentQuestion.answers.length, (index) {
-                    final answer = currentQuestion.answers[index];
+                  ...List.generate(currentQuestion!.answers.length, (index) {
+                    final answer = currentQuestion!.answers[index];
                     final isSelected = index == selectedIndex;
 
                     return GestureDetector(

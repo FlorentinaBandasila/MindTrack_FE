@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mindtrack/add_task.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/details_popup.dart';
+import 'package:mindtrack/endpoint/gettasks.dart';
+import 'package:mindtrack/models/taskmodel.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
@@ -13,6 +15,8 @@ class TaskPage extends StatefulWidget {
 class _TaskPageState extends State<TaskPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<UserTask> allTasks = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -23,16 +27,35 @@ class _TaskPageState extends State<TaskPage>
         setState(() {});
       }
     });
+    loadTasks();
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+  Future<void> loadTasks() async {
+    try {
+      final tasks = await fetchUserTasks();
+      print('Fetched tasks: ${tasks.length}');
+      for (var t in tasks) {
+        print('${t.title} - ${t.status}');
+      }
+
+      setState(() {
+        allTasks = tasks;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching tasks: $e');
+      setState(() => isLoading = false);
+    }
+  }
+
+  List<UserTask> _filteredTasks(String status) {
+    return allTasks
+        .where((task) => task.status.toLowerCase() == status)
+        .toList();
   }
 
   Widget _buildTaskCard(
-      String title, String label, String date, String tabType) {
+      String title, String label, String date, String tabType, String details) {
     Color backgroundColor;
     Color addColor;
     Color labelColor;
@@ -96,9 +119,10 @@ class _TaskPageState extends State<TaskPage>
                   child: Text(
                     label,
                     style: const TextStyle(
-                        fontSize: 12,
-                        color: MyColors.black,
-                        fontWeight: FontWeight.w500),
+                      fontSize: 12,
+                      color: MyColors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -114,8 +138,7 @@ class _TaskPageState extends State<TaskPage>
           ),
           GestureDetector(
             onTap: () {
-              showTaskOptionsPopup(
-                  context, title, "Descriptive text here", tabType);
+              showTaskOptionsPopup(context, title, details, tabType);
             },
             child: Stack(
               alignment: Alignment.center,
@@ -140,6 +163,28 @@ class _TaskPageState extends State<TaskPage>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildTabContent(String tabType) {
+    final filtered = _filteredTasks(tabType);
+    if (filtered.isEmpty) {
+      return const Center(child: Text("No tasks"));
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 140, top: 15),
+      child: Column(
+        children: filtered
+            .map((task) => _buildTaskCard(
+                  task.title,
+                  task.priority,
+                  task.endDate.split('T').first,
+                  tabType,
+                  task.details,
+                ))
+            .toList(),
       ),
     );
   }
@@ -180,10 +225,7 @@ class _TaskPageState extends State<TaskPage>
                       decoration: BoxDecoration(
                         color: MyColors.darkblue,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: MyColors.lightblue,
-                          width: 2,
-                        ),
+                        border: Border.all(color: MyColors.lightblue, width: 2),
                       ),
                       child: IgnorePointer(
                         child: TabBar(
@@ -208,55 +250,16 @@ class _TaskPageState extends State<TaskPage>
                   ],
                 ),
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      // To Do tab
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 140, top: 15),
-                        child: Column(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : TabBarView(
+                          controller: _tabController,
                           children: [
-                            _buildTaskCard("School Project", "High",
-                                "28 Dec. 2024", "todo"),
-                            _buildTaskCard("Nature Walk", "Recommended",
-                                "27 Dec. 2024", "todo"),
-                            _buildTaskCard("Creative Activities", "Recommended",
-                                "25 Dec. 2024", "todo"),
-                            _buildTaskCard(
-                                "Gym", "Medium", "28 Nov. 2024", "todo"),
-                            _buildTaskCard(
-                                "Ride a Bike", "Low", "26 Nov. 2024", "todo"),
+                            _buildTabContent("todo"),
+                            _buildTabContent("done"),
+                            _buildTabContent("abandoned"),
                           ],
                         ),
-                      ),
-
-                      // Done tab
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 140, top: 15),
-                        child: Column(
-                          children: [
-                            _buildTaskCard(
-                                "Read a Book", "Low", "28 Dec. 2024", "done"),
-                            _buildTaskCard(
-                                "Drink Water", "High", "27 Dec. 2024", "done"),
-                          ],
-                        ),
-                      ),
-
-                      // Abandoned tab
-                      SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 140, top: 15),
-                        child: Column(
-                          children: [
-                            _buildTaskCard("Study History", "High",
-                                "25 Dec. 2024", "abandoned"),
-                            _buildTaskCard("Meditation", "Recommended",
-                                "22 Dec. 2024", "abandoned"),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),

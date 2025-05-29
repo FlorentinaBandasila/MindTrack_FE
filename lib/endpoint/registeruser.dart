@@ -14,7 +14,7 @@ Future<void> registerUser(
   String full_name,
 ) async {
   final url = Uri.parse(
-    'http://192.168.1.133:5000/api/register',
+    'http://localhost:5175/api/register',
   );
   final body = {
     "username": username,

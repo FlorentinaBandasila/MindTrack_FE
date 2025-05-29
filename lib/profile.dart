@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/endpoint/editavatar.dart';
 import 'package:mindtrack/endpoint/edituser.dart';
+import 'package:mindtrack/endpoint/getquizresults.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
 import 'package:mindtrack/models/avatars.dart';
 import 'package:mindtrack/models/usermodel.dart';
@@ -36,12 +37,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUser() async {
     final user = await getUser();
     if (user != null) {
+      final title = await fetchLatestQuizTitle();
+
       setState(() {
         _user = user;
         nameController.text = user.fullname ?? "";
         emailController.text = user.email ?? "";
         phoneController.text = user.phone ?? "";
-        moodController.text = null ?? "Unknown";
+        moodController.text = title ?? "Unknown";
         _isLoading = false;
         selectedAvatar = user.avatar;
       });
