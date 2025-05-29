@@ -11,7 +11,7 @@ Future<void> patchUser(List<Map<String, dynamic>> patchOperations) async {
   final userId = decodedToken[
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 
-  final url = Uri.parse('http://192.168.1.133:5000/api/User/$userId');
+  final url = Uri.parse('http://localhost:5175/api/User/$userId');
 
   final response = await http.patch(
     url,

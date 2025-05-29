@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:mindtrack/models/quizmodel.dart';
 
 Future<List<QuestionModel>> fetchQuiz() async {
-  final url = Uri.parse('http://192.168.1.133:5000/api/Quiz');
+  final url = Uri.parse('http://localhost:5175/api/Quiz');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
