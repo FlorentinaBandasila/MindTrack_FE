@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/addtask.dart';
+import 'package:mindtrack/models/usertaskdto.dart';
 
-void showAddTaskDialog(BuildContext context) {
+void showAddTaskDialog(BuildContext context, VoidCallback onTaskAdded) {
   String selectedPriority = '';
   DateTime selectedDate = DateTime.now();
   final titleController = TextEditingController();
@@ -226,11 +228,35 @@ void showAddTaskDialog(BuildContext context) {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: () {
-                                print("Title: ${titleController.text}");
-                                print("Details: ${detailsController.text}");
-                                print("Priority: $selectedPriority");
-                                print("Date: $selectedDate");
+                              onPressed: () async {
+                                final title = titleController.text;
+                                final details = detailsController.text;
+
+                                if (title.isEmpty ||
+                                    details.isEmpty ||
+                                    selectedPriority.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content:
+                                            Text("Please complete all fields")),
+                                  );
+                                  return;
+                                }
+
+                                final task = UserTaskDTO(
+                                  userId: '',
+                                  title: title,
+                                  details: details,
+                                  priority: selectedPriority,
+                                  status: 'todo',
+                                  endDate: selectedDate,
+                                );
+
+                                await submitUserTask(task);
+                                onTaskAdded();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text("Task created")),
+                                );
                                 entry.remove();
                               },
                               child: const Text("Done",

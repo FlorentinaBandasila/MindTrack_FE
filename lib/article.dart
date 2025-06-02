@@ -23,6 +23,8 @@ class _ArticlePageState extends State<ArticlePage> {
 
   Future<void> _loadArticles() async {
     final articles = await getArticle();
+    if (!mounted) return;
+
     if (articles != null && articles is List<ArticleModel>) {
       setState(() {
         _articles = articles;

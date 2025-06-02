@@ -43,9 +43,13 @@ class _QuizPageState extends State<QuizPage> {
       setState(() {
         questions = fetchedQuestions;
         selectedAnswers.addAll(List<int?>.filled(questions.length, null));
+        _isLoadingQuestions = false;
       });
     } catch (e) {
       print('Error loading quiz: $e');
+      setState(() {
+        _isLoadingQuestions = false;
+      });
     }
   }
 

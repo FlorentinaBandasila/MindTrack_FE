@@ -54,8 +54,8 @@ class _TaskPageState extends State<TaskPage>
         .toList();
   }
 
-  Widget _buildTaskCard(
-      String title, String label, String date, String tabType, String details) {
+  Widget _buildTaskCard(String taskId, String title, String label, String date,
+      String tabType, String details) {
     Color backgroundColor;
     Color addColor;
     Color labelColor;
@@ -138,7 +138,16 @@ class _TaskPageState extends State<TaskPage>
           ),
           GestureDetector(
             onTap: () {
-              showTaskOptionsPopup(context, title, details, tabType);
+              showTaskOptionsPopup(
+                context,
+                taskId,
+                title,
+                details,
+                tabType,
+                onStatusChanged: () async {
+                  await loadTasks(); // refresh tasks after status update
+                },
+              );
             },
             child: Stack(
               alignment: Alignment.center,
@@ -178,6 +187,7 @@ class _TaskPageState extends State<TaskPage>
       child: Column(
         children: filtered
             .map((task) => _buildTaskCard(
+                  task.id,
                   task.title,
                   task.priority,
                   task.endDate.split('T').first,
@@ -273,7 +283,7 @@ class _TaskPageState extends State<TaskPage>
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(color: MyColors.lightblue, width: 2),
               ),
-              onPressed: () => showAddTaskDialog(context),
+              onPressed: () => showAddTaskDialog(context, loadTasks),
               child: const Icon(Icons.add, size: 32, color: MyColors.black),
             ),
           ),

@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/updatetaskstatus.dart';
 
 void showTaskOptionsPopup(
-    BuildContext context, String title, String description, String currentTab) {
+  BuildContext context,
+  String taskId,
+  String title,
+  String description,
+  String currentTab, {
+  VoidCallback? onStatusChanged,
+}) {
   final String taskTitle = title;
   final String taskDescription = description;
 
@@ -10,18 +17,18 @@ void showTaskOptionsPopup(
 
   if (currentTab == 'todo') {
     buttons.addAll([
-      _PopupActionButton(label: "Abandon", color: MyColors.cream),
-      _PopupActionButton(label: "Done", color: MyColors.turqouise),
+      _PopupActionButton(label: "abandoned", color: MyColors.cream),
+      _PopupActionButton(label: "done", color: MyColors.turqouise),
     ]);
   } else if (currentTab == 'done') {
     buttons.addAll([
-      _PopupActionButton(label: "Abandon", color: MyColors.cream),
-      _PopupActionButton(label: "To Do", color: MyColors.turqouise),
+      _PopupActionButton(label: "abandoned", color: MyColors.cream),
+      _PopupActionButton(label: "todo", color: MyColors.turqouise),
     ]);
   } else if (currentTab == 'abandoned') {
     buttons.addAll([
-      _PopupActionButton(label: "To Do", color: MyColors.cream),
-      _PopupActionButton(label: "Done", color: MyColors.turqouise),
+      _PopupActionButton(label: "todo", color: MyColors.cream),
+      _PopupActionButton(label: "done", color: MyColors.turqouise),
     ]);
   }
 
@@ -76,10 +83,21 @@ void showTaskOptionsPopup(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                   ),
-                                  onPressed: () {
-                                    print(
-                                        'Task "$taskTitle" moved to ${button.label}');
-                                    Navigator.of(context).pop();
+                                  onPressed: () async {
+                                    try {
+                                      await updateTaskStatus(
+                                          taskId, button.label);
+                                      if (onStatusChanged != null) {
+                                        onStatusChanged();
+                                      }
+                                      Navigator.of(context).pop();
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        content:
+                                            Text('Failed to update task: $e'),
+                                      ));
+                                    }
                                   },
                                   child: Text(
                                     button.label,
