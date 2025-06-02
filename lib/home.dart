@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/addemotion.dart';
+import 'package:mindtrack/endpoint/getmoodselection.dart';
+import 'package:mindtrack/endpoint/getuser.dart';
+import 'package:mindtrack/models/usermodel.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -11,19 +16,25 @@ class _HomeScreenState extends State<HomeScreen> {
   String selectedMood = '';
   final FocusNode _focusNode = FocusNode();
   final TextEditingController _controller = TextEditingController();
+  final storage = FlutterSecureStorage();
+  final today = DateTime.now();
+  UserModel? currentUser;
+  String firstName = '';
 
-  final moods = [
-    {"id": "happy_001", "name": "happy"},
-    {"id": "calm_002", "name": "calm"},
-    {"id": "angry_003", "name": "angry"},
-    {"id": "satisfied_004", "name": "satisfied"},
-    {"id": "sad_005", "name": "sad"},
-    {"id": "stressed_006", "name": "stressed"},
+  List<MoodModel> allMoods = [];
+  final List<String> moodOrder = [
+    "happy",
+    "calm",
+    "angry",
+    "satisfied",
+    "sad",
+    "stressed"
   ];
 
   @override
   void initState() {
     super.initState();
+
     _focusNode.addListener(() {
       if (_focusNode.hasFocus) {
         setState(() => isExpanded = true);
@@ -31,6 +42,62 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => isExpanded = false);
       }
     });
+
+    loadUser();
+    loadSelectedMood();
+    loadMoods();
+  }
+
+  Future<void> loadSelectedMood() async {
+    final storage = FlutterSecureStorage();
+    final mood = await storage.read(key: 'selected_mood');
+    final dateStr = await storage.read(key: 'selected_mood_date');
+
+    if (mood != null && dateStr != null) {
+      final savedDate = DateTime.tryParse(dateStr);
+      final now = DateTime.now();
+
+      if (savedDate != null &&
+          savedDate.year == now.year &&
+          savedDate.month == now.month &&
+          savedDate.day == now.day) {
+        setState(() {
+          selectedMood = mood;
+        });
+      } else {
+        await storage.delete(key: 'selected_mood');
+        await storage.delete(key: 'selected_mood_date');
+        setState(() {
+          selectedMood = '';
+        });
+      }
+    }
+  }
+
+  Future<void> loadMoods() async {
+    try {
+      final fetched = await fetchMoodsFromBackend();
+
+      fetched.sort((a, b) {
+        return moodOrder.indexOf(a.name).compareTo(moodOrder.indexOf(b.name));
+      });
+
+      setState(() {
+        allMoods = fetched;
+      });
+    } catch (e) {
+      print("Error loading moods: $e");
+    }
+  }
+
+  Future<void> loadUser() async {
+    final user = await getUser();
+    if (mounted) {
+      setState(() {
+        currentUser = user;
+        firstName = user?.fullname.split(' ').first ?? '';
+      });
+    }
   }
 
   @override
@@ -76,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               TextSpan(
                                   text:
-                                      "Hello, Flory\nHow do you feel about your\n"),
+                                      "Hello, ${firstName.isNotEmpty ? firstName : '...'}\nHow do you feel about your\n"),
                               TextSpan(
                                 text: "current\nemotions?",
                                 style: TextStyle(fontWeight: FontWeight.bold),
@@ -143,15 +210,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: moods.map((mood) {
-                          final name = mood['name']!;
-                          final isSelected = selectedMood == name;
+                        children: allMoods.map((mood) {
+                          final imageName = mood.name.toLowerCase();
+                          final isSelected = selectedMood == mood.name;
 
                           return GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               setState(() {
-                                selectedMood = name;
+                                selectedMood = mood.name;
                               });
+
+                              await storage.write(
+                                  key: 'selected_mood', value: mood.name);
+                              await storage.write(
+                                  key: 'selected_mood_date',
+                                  value: today.toIso8601String());
+
+                              await sendEmotionToBackend(
+                                moodId: mood.id,
+                                reflection: _controller.text.trim(),
+                              );
                             },
                             child: Column(
                               children: [
@@ -162,9 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     shape: BoxShape.circle,
                                     border: isSelected
                                         ? Border.all(
-                                            color: MyColors.white,
-                                            width: 3.5,
-                                          )
+                                            color: MyColors.white, width: 3.5)
                                         : null,
                                     boxShadow: !isSelected
                                         ? [
@@ -179,14 +255,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   child: ClipOval(
                                     child: Image.asset(
-                                      "assets/icons/$name.png",
+                                      "assets/icons/$imageName.png",
                                       fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
                                 SizedBox(height: 4),
                                 Text(
-                                  name[0].toUpperCase() + name.substring(1),
+                                  mood.name,
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,

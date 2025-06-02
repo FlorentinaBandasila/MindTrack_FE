@@ -76,7 +76,7 @@ class _CalendarPageState extends State<CalendarPage> {
           date.month == currentMonth.month) {
         final key =
             "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-        moodMap.putIfAbsent(key, () => mood.mood_Name);
+        moodMap.putIfAbsent(key, () => mood.mood_Name.toLowerCase());
       }
     }
 
@@ -98,8 +98,8 @@ class _CalendarPageState extends State<CalendarPage> {
       };
 
       for (var item in data) {
-        if (item != null && stats.containsKey(item.moodName)) {
-          stats[item.moodName] = item.count;
+        if (item != null && stats.containsKey(item.moodName.toLowerCase())) {
+          stats[item.moodName.toLowerCase()] = item.count;
         }
       }
 
