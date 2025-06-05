@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Padding(
                       padding: EdgeInsets.only(left: 15),
                       child: Text(
-                        "Email",
+                        "Username",
                         style: TextStyle(
                           fontFamily: 'Inter-VariableFont_opsz,wght',
                           fontWeight: FontWeight.bold,

@@ -34,12 +34,9 @@ class _TaskPageState extends State<TaskPage>
     try {
       final tasks = await fetchUserTasks();
       print('Fetched tasks: ${tasks.length}');
-      for (var t in tasks) {
-        print('${t.title} - ${t.status}');
-      }
 
       setState(() {
-        allTasks = tasks;
+        allTasks = tasks.whereType<UserTask>().toList();
         isLoading = false;
       });
     } catch (e) {

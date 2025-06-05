@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:mindtrack/about.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/endpoint/editavatar.dart';
 import 'package:mindtrack/endpoint/edituser.dart';
 import 'package:mindtrack/endpoint/getquizresults.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
+import 'package:mindtrack/journal.dart';
 import 'package:mindtrack/models/avatars.dart';
 import 'package:mindtrack/models/usermodel.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -51,7 +55,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       setState(() => _isLoading = false);
     }
-    if (selectedAvatar == "") selectedAvatar = avatarList.first;
   }
 
   Future<void> _handleAvatarChange(String avatar) async {
@@ -94,14 +97,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: 160,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
+                              color: MyColors.cream,
                               border: Border.all(
                                   color: MyColors.lightblue, width: 6),
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    "assets/avatars/${selectedAvatar ?? avatarList.first}"),
-                                fit: BoxFit.cover,
-                              ),
                             ),
+                            child: selectedAvatar != null &&
+                                    selectedAvatar!.isNotEmpty
+                                ? ClipOval(
+                                    child: Image.asset(
+                                      "assets/avatars/$selectedAvatar",
+                                      fit: BoxFit.cover,
+                                      width: 160,
+                                      height: 160,
+                                    ),
+                                  )
+                                : const Center(
+                                    child: Icon(
+                                      Icons.add,
+                                      size: 48,
+                                      color: MyColors.black,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),
@@ -191,21 +207,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.info, "About Us"),
+                      _buildMenuItem(Icons.book_outlined, "Journal", () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => JournalScreen()),
+                        );
+                      }),
                       const SizedBox(height: 4),
                       Container(
                         width: 300,
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.settings, "Settings"),
+                      _buildMenuItem(Icons.info_outline, "About Us", () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AboutScreen()),
+                        );
+                      }),
                       const SizedBox(height: 4),
                       Container(
                         width: 300,
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.logout, "Log Out"),
+                      _buildMenuItem(Icons.logout, "Log Out", () {
+                        if (Platform.isAndroid) {
+                          SystemNavigator.pop();
+                        } else if (Platform.isIOS) {
+                          exit(0);
+                        }
+                      }),
                       const SizedBox(height: 4),
                       Container(
                         width: 300,
@@ -265,13 +299,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String label) {
+  Widget _buildMenuItem(IconData icon, String label, VoidCallback onTap) {
     return SizedBox(
       height: 45,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: GestureDetector(
-          onTap: () {},
+          onTap: onTap,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
