@@ -15,6 +15,13 @@ void showTaskOptionsPopup(
 
   final List<_PopupActionButton> buttons = [];
 
+  String formatLabel(String label) {
+    if (label == 'todo') return 'To Do';
+    if (label == 'done') return 'Done';
+    if (label == 'abandoned') return 'Abandon';
+    return label;
+  }
+
   if (currentTab == 'todo') {
     buttons.addAll([
       _PopupActionButton(label: "abandoned", color: MyColors.cream),
@@ -100,7 +107,7 @@ void showTaskOptionsPopup(
                                     }
                                   },
                                   child: Text(
-                                    button.label,
+                                    formatLabel(button.label),
                                     style: const TextStyle(
                                       color: MyColors.black,
                                       fontSize: 14,

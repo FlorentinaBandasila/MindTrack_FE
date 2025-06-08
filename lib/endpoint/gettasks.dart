@@ -16,7 +16,8 @@ Future<List<UserTask?>> fetchUserTasks() async {
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
   print('UserId from token: $userId');
 
-  final url = Uri.parse('http://localhost:5175/api/UserTask/user/$userId');
+  final url =
+      Uri.parse('http://localhost:5175/api/UserTask/user/$userId/today');
   final response = await http.get(
     url,
     headers: {'Authorization': 'Bearer $token'},

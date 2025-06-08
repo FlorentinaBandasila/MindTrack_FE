@@ -32,10 +32,7 @@ Future<void> registerUser(
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Account created successfully!')));
-      await login(context, username, password);
+      await login(context, email, password);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const QuizPage()),

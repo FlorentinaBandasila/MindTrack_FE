@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+
 import 'package:mindtrack/about.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/endpoint/editavatar.dart';
-import 'package:mindtrack/endpoint/edituser.dart';
+
 import 'package:mindtrack/endpoint/getquizresults.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
 import 'package:mindtrack/journal.dart';
@@ -27,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserModel? _user;
   String? selectedAvatar;
 
-  final nameController = TextEditingController();
+  final user_nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final moodController = TextEditingController();
@@ -45,7 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       setState(() {
         _user = user;
-        nameController.text = user.fullname ?? "";
+        user_nameController.text = user.username ?? "";
         emailController.text = user.email ?? "";
         phoneController.text = user.phone ?? "";
         moodController.text = title ?? "Unknown";
@@ -97,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: 160,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: MyColors.cream,
+                              color: MyColors.pink,
                               border: Border.all(
                                   color: MyColors.lightblue, width: 6),
                             ),
@@ -122,8 +120,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      _buildProfileField(
-                          const Icon(Icons.person), nameController, isEditing),
+                      _buildProfileField(const Icon(Icons.person),
+                          user_nameController, isEditing),
                       _buildProfileField(
                           const Icon(Icons.email), emailController, isEditing),
                       _buildProfileField(
@@ -134,74 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         isEditing,
                         alwaysReadOnly: true,
                       ),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: 145,
-                        height: 30,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            if (isEditing) {
-                              List<Map<String, dynamic>> patchOps = [];
-
-                              if (nameController.text != _user?.fullname) {
-                                patchOps.add({
-                                  "op": "replace",
-                                  "path": "/fullname",
-                                  "value": nameController.text,
-                                });
-                              }
-
-                              if (emailController.text != _user?.email) {
-                                patchOps.add({
-                                  "op": "replace",
-                                  "path": "/email",
-                                  "value": emailController.text,
-                                });
-                              }
-
-                              if (phoneController.text != _user?.phone) {
-                                patchOps.add({
-                                  "op": "replace",
-                                  "path": "/phone",
-                                  "value": phoneController.text,
-                                });
-                              }
-
-                              await patchUser(patchOps);
-                              await _loadUser();
-                            }
-
-                            setState(() => isEditing = !isEditing);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: MyColors.pink,
-                            foregroundColor: MyColors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Center(
-                                child: Text(
-                                  isEditing ? 'Save' : 'Edit',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Inter-VariableFont_opsz,wght',
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 12,
-                                child: Icon(Icons.edit, size: 20),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 36),
                       Container(
                         width: 300,
                         height: 2,

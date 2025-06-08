@@ -16,7 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _full_nameController = TextEditingController();
+  final TextEditingController _first_nameController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   bool isChecked = false;
@@ -100,7 +100,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: Padding(
                         padding: EdgeInsets.only(left: 15),
                         child: Text(
-                          "First Name and Last Name",
+                          "First Name",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -112,7 +112,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       width: 260,
                       height: 35,
                       child: TextFormField(
-                        controller: _full_nameController,
+                        controller: _first_nameController,
                         textAlignVertical: TextAlignVertical.center,
                         style: const TextStyle(),
                         decoration: InputDecoration(
@@ -417,7 +417,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               _confirmPasswordController.text.trim();
                           final email = _emailController.text.trim();
                           final phone = _phoneController.text.trim();
-                          final fullName = _full_nameController.text.trim();
+                          final fullName = _first_nameController.text.trim();
 
                           setState(() {
                             _formError = null;

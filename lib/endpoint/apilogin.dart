@@ -8,14 +8,14 @@ final storage = FlutterSecureStorage();
 
 Future<void> login(
   BuildContext context,
-  String username,
+  String identifier,
   String password,
 ) async {
   final url = Uri.parse('http://localhost:5175/api/login');
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'username': username, 'password': password}),
+    body: jsonEncode({'identifier': identifier, 'password': password}),
   );
 
   if (response.statusCode == 200) {

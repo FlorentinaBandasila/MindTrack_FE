@@ -17,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _identifierController = TextEditingController();
   bool _obscureText = true;
 
   @override
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Padding(
                       padding: EdgeInsets.only(left: 15),
                       child: Text(
-                        "Username",
+                        "Email or Username",
                         style: TextStyle(
                           fontFamily: 'Inter-VariableFont_opsz,wght',
                           fontWeight: FontWeight.bold,
@@ -103,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 260,
                     height: 35,
                     child: TextFormField(
-                      controller: _usernameController,
+                      controller: _identifierController,
                       textAlignVertical: TextAlignVertical.center,
                       style: const TextStyle(
                         fontFamily: 'Inter-VariableFont_opsz,wght',
@@ -177,10 +177,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 30,
                     child: ElevatedButton(
                       onPressed: () {
-                        final username = _usernameController.text;
+                        final Email = _identifierController.text;
                         final password = _passwordController.text;
 
-                        login(context, username, password);
+                        login(context, Email, password);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: MyColors.grey,

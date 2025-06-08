@@ -147,23 +147,29 @@ class _QuizPageState extends State<QuizPage> {
                         ),
                       ),
                       currentQuestionIndex < questions.length - 1
-                          ? GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedAnswers[currentQuestionIndex] =
-                                      selectedIndex;
-                                  currentQuestionIndex++;
-                                  selectedIndex =
-                                      selectedAnswers[currentQuestionIndex];
-                                });
-                              },
-                              child: CircleAvatar(
-                                radius: 24,
-                                backgroundColor: MyColors.cream,
-                                child: Image.asset(
-                                  'assets/icons/right_arrow.png',
-                                  width: 40,
-                                  height: 40,
+                          ? Opacity(
+                              opacity: selectedIndex == null ? 0.5 : 1.0,
+                              child: GestureDetector(
+                                onTap: selectedIndex == null
+                                    ? null
+                                    : () {
+                                        setState(() {
+                                          selectedAnswers[
+                                                  currentQuestionIndex] =
+                                              selectedIndex;
+                                          currentQuestionIndex++;
+                                          selectedIndex = selectedAnswers[
+                                              currentQuestionIndex];
+                                        });
+                                      },
+                                child: CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: MyColors.cream,
+                                  child: Image.asset(
+                                    'assets/icons/right_arrow.png',
+                                    width: 40,
+                                    height: 40,
+                                  ),
                                 ),
                               ),
                             )
@@ -246,6 +252,10 @@ class _QuizPageState extends State<QuizPage> {
                               margin: const EdgeInsets.only(bottom: 30),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: MyColors.black,
+                                  width: 1,
+                                ),
                                 gradient: LinearGradient(
                                   colors: [
                                     MyColors.pink.withOpacity(0.2),
@@ -267,7 +277,7 @@ class _QuizPageState extends State<QuizPage> {
                       child: SizedBox(
                         width: 140,
                         child: ElevatedButton(
-                          onPressed: saveResults,
+                          onPressed: selectedIndex == null ? null : saveResults,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: MyColors.grey,
                             foregroundColor: MyColors.black,

@@ -20,6 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final today = DateTime.now();
   UserModel? currentUser;
   String firstName = '';
+  bool showError = false;
+  String savedMood = '';
+  bool isTextFieldFocused = false;
 
   List<MoodModel> allMoods = [];
   final List<String> moodOrder = [
@@ -36,11 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        setState(() => isExpanded = true);
-      } else if (_controller.text.trim().isEmpty) {
-        setState(() => isExpanded = false);
-      }
+      setState(() {
+        isTextFieldFocused = _focusNode.hasFocus;
+        isExpanded = _focusNode.hasFocus || _controller.text.trim().isNotEmpty;
+      });
     });
 
     loadUser();
@@ -49,29 +51,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadSelectedMood() async {
-    final storage = FlutterSecureStorage();
     final mood = await storage.read(key: 'selected_mood');
     final dateStr = await storage.read(key: 'selected_mood_date');
+    final now = DateTime.now();
 
     if (mood != null && dateStr != null) {
       final savedDate = DateTime.tryParse(dateStr);
-      final now = DateTime.now();
 
       if (savedDate != null &&
           savedDate.year == now.year &&
           savedDate.month == now.month &&
           savedDate.day == now.day) {
         setState(() {
+          savedMood = mood;
           selectedMood = mood;
         });
-      } else {
-        await storage.delete(key: 'selected_mood');
-        await storage.delete(key: 'selected_mood_date');
-        setState(() {
-          selectedMood = '';
-        });
+        return;
       }
     }
+
+    await storage.delete(key: 'selected_mood');
+    await storage.delete(key: 'selected_mood_date');
+
+    setState(() {
+      savedMood = '';
+      selectedMood = '';
+    });
   }
 
   Future<void> loadMoods() async {
@@ -95,7 +100,50 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         currentUser = user;
-        firstName = user?.fullname.split(' ').first ?? '';
+        firstName = user?.fullname ?? '';
+      });
+    }
+  }
+
+  Future<void> handleSave() async {
+    final reflectionText = _controller.text.trim();
+    final isReflection = reflectionText.isNotEmpty;
+    final isNewMood = selectedMood.isNotEmpty && selectedMood != savedMood;
+
+    if (isReflection && !isNewMood) {
+      setState(() {
+        selectedMood = '';
+        showError = true;
+      });
+      return;
+    }
+
+    if (selectedMood.isEmpty) {
+      setState(() => showError = true);
+      return;
+    }
+
+    setState(() => showError = false);
+
+    final mood = allMoods.firstWhere((m) => m.name == selectedMood);
+
+    await storage.write(key: 'selected_mood', value: mood.name);
+    await storage.write(
+      key: 'selected_mood_date',
+      value: today.toIso8601String(),
+    );
+
+    await sendEmotionToBackend(
+      moodId: mood.id,
+      reflection: reflectionText,
+    );
+
+    if (mounted) {
+      setState(() {
+        savedMood = selectedMood;
+        _controller.clear();
+        isExpanded = false;
+        isTextFieldFocused = false;
       });
     }
   }
@@ -112,14 +160,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: MyColors.grey,
       body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
+        onTap: () => FocusScope.of(context).unfocus(),
         child: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding:
-                  const EdgeInsets.only(left: 9, top: 9, right: 9, bottom: 0),
+              padding: const EdgeInsets.only(left: 9, top: 9, right: 9),
               child: Column(
                 children: [
                   Container(
@@ -181,17 +226,32 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                               ),
-                              isExpanded
-                                  ? Icon(Icons.save_as_outlined,
-                                      size: 25, color: MyColors.black)
-                                  : Image.asset(
-                                      "assets/icons/pencil.png",
-                                      width: 20,
-                                      height: 20,
-                                    ),
+                              GestureDetector(
+                                onTap: handleSave,
+                                child: isExpanded
+                                    ? Icon(Icons.save_as_outlined,
+                                        size: 25, color: MyColors.black)
+                                    : Image.asset(
+                                        "assets/icons/pencil.png",
+                                        width: 20,
+                                        height: 20,
+                                      ),
+                              ),
                             ],
                           ),
                         ),
+                        SizedBox(height: 20),
+                        if (showError)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 9, bottom: 4),
+                            child: Text(
+                              "Please select a mood before saving!",
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
                       ],
                     ),
                   ),
@@ -212,12 +272,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: allMoods.map((mood) {
                           final imageName = mood.name.toLowerCase();
-                          final isSelected = selectedMood == mood.name;
+                          final isSelected =
+                              !isTextFieldFocused && selectedMood == mood.name;
 
                           return GestureDetector(
                             onTap: () async {
                               setState(() {
                                 selectedMood = mood.name;
+                                showError = false;
                               });
 
                               await storage.write(
@@ -226,10 +288,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                   key: 'selected_mood_date',
                                   value: today.toIso8601String());
 
-                              await sendEmotionToBackend(
-                                moodId: mood.id,
-                                reflection: _controller.text.trim(),
-                              );
+                              final reflectionText = _controller.text.trim();
+
+                              if (reflectionText.isEmpty) {
+                                await sendEmotionToBackend(
+                                  moodId: mood.id,
+                                  reflection: "",
+                                );
+
+                                if (mounted) {
+                                  setState(() {
+                                    _controller.clear();
+                                    isExpanded = false;
+                                  });
+                                }
+                              }
                             },
                             child: Column(
                               children: [
