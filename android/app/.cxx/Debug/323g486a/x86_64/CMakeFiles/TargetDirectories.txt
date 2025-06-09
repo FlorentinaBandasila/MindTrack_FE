@@ -1,0 +1,2 @@
+C:/MindTrack/MindTrack_FE/android/app/.cxx/Debug/323g486a/x86_64/CMakeFiles/edit_cache.dir
+C:/MindTrack/MindTrack_FE/android/app/.cxx/Debug/323g486a/x86_64/CMakeFiles/rebuild_cache.dir
