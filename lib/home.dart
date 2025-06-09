@@ -3,7 +3,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/endpoint/addemotion.dart';
 import 'package:mindtrack/endpoint/getmoodselection.dart';
+import 'package:mindtrack/endpoint/getprocente.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
+import 'package:mindtrack/models/procentemodel.dart';
 import 'package:mindtrack/models/usermodel.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showError = false;
   String savedMood = '';
   bool isTextFieldFocused = false;
+  WeeklyProgress? progress;
 
   List<MoodModel> allMoods = [];
   final List<String> moodOrder = [
@@ -48,6 +51,16 @@ class _HomeScreenState extends State<HomeScreen> {
     loadUser();
     loadSelectedMood();
     loadMoods();
+    loadProgress();
+  }
+
+  Future<void> loadProgress() async {
+    final fetchedProgress = await fetchWeeklyProgress();
+    if (mounted) {
+      setState(() {
+        progress = fetchedProgress;
+      });
+    }
   }
 
   Future<void> loadSelectedMood() async {
@@ -381,7 +394,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      "100%",
+                                      "${progress?.percentage ?? 0}%",
                                       style: TextStyle(
                                         fontSize: 70,
                                         fontWeight: FontWeight.w600,
