@@ -38,8 +38,17 @@ Future<void> registerUser(
         MaterialPageRoute(builder: (context) => const QuizPage()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed: ${response.body}')),
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Email/Username Already Exists"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
       );
     }
   } catch (e) {
