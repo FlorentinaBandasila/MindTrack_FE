@@ -14,7 +14,7 @@ Future<void> registerUser(
   String full_name,
 ) async {
   final url = Uri.parse(
-    'http://localhost:5175/api/register',
+    'http://localhost:5000/api/register',
   );
   final body = {
     "username": username,
@@ -32,6 +32,9 @@ Future<void> registerUser(
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
+      await storage.delete(key: 'selected_mood');
+      await storage.delete(key: 'selected_mood_date');
+
       await login(context, email, password);
       Navigator.push(
         context,
@@ -41,7 +44,8 @@ Future<void> registerUser(
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Email/Username Already Exists"),
+          title: const Text("Register Failed"),
+          content: Text("Username/Email already used"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),

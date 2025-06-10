@@ -65,12 +65,12 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
           ),
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.18,
+            top: MediaQuery.of(context).size.height * 0.16,
             left: 0,
             right: 0,
             child: Container(
               width: 300,
-              height: 530,
+              height: 540,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(

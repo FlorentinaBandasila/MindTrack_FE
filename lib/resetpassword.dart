@@ -22,7 +22,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Future<bool> resetPasswordWithCode(
       String email, String code, String newPassword) async {
-    final url = Uri.parse("http://localhost:5175/api/User/reset-password-code");
+    final url = Uri.parse("http://localhost:5000/api/User/reset-password-code");
 
     try {
       final response = await http.post(
@@ -122,6 +122,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             right: 0,
             child: Container(
               width: 300,
+              height: 380,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -178,7 +179,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Padding(

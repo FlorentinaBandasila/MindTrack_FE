@@ -15,7 +15,6 @@ class StartPage extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // Top wave
           Positioned(
             top: 0,
             left: 0,
@@ -25,8 +24,6 @@ class StartPage extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Bottom wave
           Positioned(
             bottom: 0,
             left: 0,
@@ -36,8 +33,6 @@ class StartPage extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
-          // Content
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

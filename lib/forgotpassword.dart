@@ -15,13 +15,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
 
   Future<bool> sendResetEmail(String email) async {
-    final url = Uri.parse(
-        "http://localhost:5175/api/User/forgot-password"); // replace baseUrl with your actual backend URL
+    final url = Uri.parse("http://localhost:5000/api/User/forgot-password");
     try {
       final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode(email), // email as raw string, per your backend spec
+        body: jsonEncode(email),
       );
       return response.statusCode == 200;
     } catch (e) {

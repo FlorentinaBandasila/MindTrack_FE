@@ -30,7 +30,7 @@ Future<void> sendEmotionToBackend({
   );
 
   final response = await http.post(
-    Uri.parse('http://localhost:5175/api/Emotion'),
+    Uri.parse('http://localhost:5000/api/Emotion'),
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',

@@ -30,18 +30,21 @@ class _TaskPageState extends State<TaskPage>
     loadTasks();
   }
 
+  bool isFetching = false;
+
   Future<void> loadTasks() async {
+    if (isFetching) return;
+    isFetching = true;
     try {
       final tasks = await fetchUserTasks();
-      print('Fetched tasks: ${tasks.length}');
-
       setState(() {
         allTasks = tasks.whereType<UserTask>().toList();
         isLoading = false;
       });
     } catch (e) {
-      print('Error fetching tasks: $e');
-      setState(() => isLoading = false);
+      print('Error: $e');
+    } finally {
+      isFetching = false;
     }
   }
 
@@ -272,7 +275,7 @@ class _TaskPageState extends State<TaskPage>
             ),
           ),
           Positioned(
-            bottom: 90,
+            bottom: 100,
             right: 20,
             child: FloatingActionButton(
               backgroundColor: MyColors.darkblue,

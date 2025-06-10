@@ -7,7 +7,7 @@ final FlutterSecureStorage storage = FlutterSecureStorage();
 
 Future<List<ArticleModel>> getArticle() async {
   final response = await http.get(
-    Uri.parse('http://localhost:5175/api/Article'),
+    Uri.parse('http://localhost:5000/api/Article'),
   );
 
   if (response.statusCode == 200) {

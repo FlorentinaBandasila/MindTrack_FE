@@ -11,7 +11,7 @@ Future<void> login(
   String identifier,
   String password,
 ) async {
-  final url = Uri.parse('http://localhost:5175/api/login');
+  final url = Uri.parse('http://localhost:5000/api/login');
   final response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -20,6 +20,19 @@ Future<void> login(
 
   if (response.statusCode == 200) {
     final token = response.body.replaceAll('"', '');
+    final savedDateStr = await storage.read(key: 'selected_mood_date');
+    final now = DateTime.now();
+    final savedDate =
+        savedDateStr != null ? DateTime.tryParse(savedDateStr) : null;
+
+    if (savedDate == null ||
+        savedDate.year != now.year ||
+        savedDate.month != now.month ||
+        savedDate.day != now.day) {
+      await storage.delete(key: 'selected_mood');
+      await storage.delete(key: 'selected_mood_date');
+    }
+
     await storage.write(key: 'token', value: token);
 
     final payload = jsonDecode(

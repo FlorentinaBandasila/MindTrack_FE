@@ -56,14 +56,6 @@ class _QuizPageState extends State<QuizPage> {
   void saveResults() async {
     final result = await submitQuizAnswers(questions, selectedAnswers);
 
-    if (result != null) {
-      print("Quiz submitted successfully:");
-      print("Result ID: ${result['quizResult_id']}");
-      print("Points: ${result['points']}");
-      print("Title: ${result['title']}");
-      print("Date: ${result['date']}");
-    }
-
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const LoadingScreen()),
@@ -94,6 +86,8 @@ class _QuizPageState extends State<QuizPage> {
       );
     }
 
+    double answerSpacing = question.answers.length >= 7 ? 12 : 30;
+
     return Scaffold(
       backgroundColor: MyColors.grey,
       body: Stack(
@@ -112,7 +106,7 @@ class _QuizPageState extends State<QuizPage> {
           ),
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               child: Column(
                 children: [
                   Row(
@@ -202,40 +196,41 @@ class _QuizPageState extends State<QuizPage> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  ...List.generate(currentQuestion!.answers.length, (index) {
-                    final answer = currentQuestion!.answers[index];
-                    final isSelected = index == selectedIndex;
+                  Column(
+                    children:
+                        List.generate(currentQuestion!.answers.length, (index) {
+                      final answer = currentQuestion!.answers[index];
+                      final isSelected = index == selectedIndex;
 
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedIndex = index;
-                          selectedAnswers[currentQuestionIndex] = index;
-                        });
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: 285,
-                            height: 46,
-                            margin: const EdgeInsets.only(bottom: 30),
-                            decoration: BoxDecoration(
-                              color: MyColors.cream,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.25),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: Align(
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                            selectedAnswers[currentQuestionIndex] = index;
+                          });
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 285,
+                              height: 46,
+                              margin: EdgeInsets.only(bottom: answerSpacing),
+                              decoration: BoxDecoration(
+                                color: MyColors.cream,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.25),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
                               alignment: Alignment.centerLeft,
                               child: Padding(
                                 padding: const EdgeInsets.only(left: 15),
                                 child: Text(
-                                  answer.text, // AICI: afișăm answer.text
+                                  answer.text,
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontFamily: 'Inter-VariableFont_opsz,wght',
@@ -244,33 +239,33 @@ class _QuizPageState extends State<QuizPage> {
                                 ),
                               ),
                             ),
-                          ),
-                          if (isSelected)
-                            Container(
-                              width: 285,
-                              height: 46,
-                              margin: const EdgeInsets.only(bottom: 30),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: MyColors.black,
-                                  width: 1,
-                                ),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    MyColors.pink.withOpacity(0.2),
-                                    MyColors.pink.withOpacity(0.4),
-                                    MyColors.pink.withOpacity(0.7),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                            if (isSelected)
+                              Container(
+                                width: 285,
+                                height: 46,
+                                margin: EdgeInsets.only(bottom: answerSpacing),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: MyColors.black,
+                                    width: 1,
+                                  ),
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      MyColors.pink.withOpacity(0.2),
+                                      MyColors.pink.withOpacity(0.4),
+                                      MyColors.pink.withOpacity(0.7),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
+                          ],
+                        ),
+                      );
+                    }),
+                  ),
                   if (currentQuestionIndex == questions.length - 1)
                     Padding(
                       padding: const EdgeInsets.only(top: 40),

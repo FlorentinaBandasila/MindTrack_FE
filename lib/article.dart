@@ -36,12 +36,21 @@ class _ArticlePageState extends State<ArticlePage> {
   }
 
   void _openLink(String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+    final uri = Uri.tryParse(url.trim());
+
+    if (uri != null && uri.hasScheme) {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not launch the URL')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not launch the URL')),
+        const SnackBar(content: Text('Invalid URL format')),
       );
     }
   }
@@ -62,12 +71,6 @@ class _ArticlePageState extends State<ArticlePage> {
             clipBehavior: Clip.antiAlias,
             child: Stack(
               children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Image.asset('assets/icons/article_sus.png'),
-                ),
                 Positioned(
                   bottom: 0,
                   left: 0,

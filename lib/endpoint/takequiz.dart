@@ -40,7 +40,7 @@ Future<Map<String, dynamic>?> submitQuizAnswers(
   }
 
   final url =
-      Uri.parse('http://localhost:5175/api/Quiz/user/$userId/submit-answers');
+      Uri.parse('http://localhost:5000/api/Quiz/user/$userId/submit-answers');
 
   final response = await http.post(
     url,

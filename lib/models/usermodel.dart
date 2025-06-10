@@ -1,4 +1,5 @@
 class UserModel {
+  final String id;
   final String username;
   final String email;
   final String phone;
@@ -7,7 +8,8 @@ class UserModel {
   final String avatar;
 
   UserModel(
-      {required this.username,
+      {required this.id,
+      required this.username,
       required this.email,
       required this.phone,
       required this.fullname,
@@ -16,6 +18,7 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
+      id: json['user_id'],
       username: json['username'],
       email: json['email'],
       phone: json['phone'],

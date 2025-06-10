@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:mindtrack/about.dart';
 import 'package:mindtrack/constant/constant.dart';
@@ -6,11 +7,15 @@ import 'package:mindtrack/endpoint/editavatar.dart';
 
 import 'package:mindtrack/endpoint/getquizresults.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
+import 'package:mindtrack/firstpage.dart';
 import 'package:mindtrack/journal.dart';
+import 'package:mindtrack/login.dart';
 import 'package:mindtrack/models/avatars.dart';
 import 'package:mindtrack/models/usermodel.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+
+final storage = FlutterSecureStorage();
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -38,8 +43,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadUser() async {
     final user = await getUser();
+    if (!mounted) return;
+
     if (user != null) {
       final title = await fetchLatestQuizTitle();
+      if (!mounted) return;
 
       setState(() {
         _user = user;
@@ -51,18 +59,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         selectedAvatar = user.avatar;
       });
     } else {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _handleAvatarChange(String avatar) async {
     final success = await updateAvatar(avatar);
+    if (!mounted) return;
 
     if (success) {
       await _loadUser();
     } else {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update avatar')),
+        const SnackBar(content: Text('Failed to update avatar')),
       );
     }
   }
@@ -86,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                   child: Column(
                     children: [
-                      const SizedBox(height: 49),
+                      const SizedBox(height: 60),
                       GestureDetector(
                         onTap: _showAvatarPicker,
                         child: Center(
@@ -164,12 +175,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.logout, "Log Out", () {
-                        if (Platform.isAndroid) {
-                          SystemNavigator.pop();
-                        } else if (Platform.isIOS) {
-                          exit(0);
-                        }
+                      _buildMenuItem(Icons.logout, "Log Out", () async {
+                        await storage.delete(key: 'token');
+                        if (!context.mounted) return;
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StartPage(),
+                          ),
+                        );
                       }),
                       const SizedBox(height: 4),
                       Container(

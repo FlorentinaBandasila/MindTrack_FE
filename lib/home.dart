@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String savedMood = '';
   bool isTextFieldFocused = false;
   WeeklyProgress? progress;
+  bool moodManuallySelected = false;
 
   List<MoodModel> allMoods = [];
   final List<String> moodOrder = [
@@ -49,9 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     loadUser();
-    loadSelectedMood();
-    loadMoods();
     loadProgress();
+    loadMoods().then((_) {
+      loadSelectedMood();
+    });
   }
 
   Future<void> loadProgress() async {
@@ -68,6 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final dateStr = await storage.read(key: 'selected_mood_date');
     final now = DateTime.now();
 
+    print("Saved mood: $mood, Saved date: $dateStr");
+
     if (mood != null && dateStr != null) {
       final savedDate = DateTime.tryParse(dateStr);
 
@@ -79,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
           savedMood = mood;
           selectedMood = mood;
         });
+        print("Mood restored: $mood");
         return;
       }
     }
@@ -95,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> loadMoods() async {
     try {
       final fetched = await fetchMoodsFromBackend();
+      print("Moods fetched: ${fetched.map((m) => m.name).toList()}");
 
       fetched.sort((a, b) {
         return moodOrder.indexOf(a.name).compareTo(moodOrder.indexOf(b.name));
@@ -157,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _controller.clear();
         isExpanded = false;
         isTextFieldFocused = false;
+        moodManuallySelected = false;
       });
     }
   }
@@ -285,13 +292,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: allMoods.map((mood) {
                           final imageName = mood.name.toLowerCase();
-                          final isSelected =
-                              !isTextFieldFocused && selectedMood == mood.name;
+                          final isSelected = selectedMood == mood.name &&
+                              (!isTextFieldFocused || moodManuallySelected);
 
                           return GestureDetector(
                             onTap: () async {
                               setState(() {
                                 selectedMood = mood.name;
+                                moodManuallySelected = true;
                                 showError = false;
                               });
 
@@ -364,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 20),
                   Container(
                     width: 345,
-                    height: 268,
+                    height: 258,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: MyColors.turqouise,

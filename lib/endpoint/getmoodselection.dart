@@ -18,7 +18,7 @@ class MoodModel {
 
 Future<List<MoodModel>> fetchMoodsFromBackend() async {
   final response = await http.get(
-    Uri.parse('http://localhost:5175/api/MoodSelection'),
+    Uri.parse('http://localhost:5000/api/MoodSelection'),
     headers: {'Content-Type': 'application/json'},
   );
 

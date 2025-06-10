@@ -8,7 +8,7 @@ Future<void> updateTaskStatus(String taskId, String status) async {
   final token = await storage.read(key: 'token') ?? '';
 
   final url =
-      Uri.parse('http://localhost:5175/api/UserTask/$taskId/update-status');
+      Uri.parse('http://localhost:5000/api/UserTask/$taskId/update-status');
 
   final response = await http.put(
     url,

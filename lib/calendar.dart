@@ -282,7 +282,7 @@ class _CalendarPageState extends State<CalendarPage> {
               const SizedBox(height: 10),
               Container(
                 width: 345,
-                height: 232,
+                height: 245,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: MyColors.cream,

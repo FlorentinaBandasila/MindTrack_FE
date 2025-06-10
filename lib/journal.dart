@@ -38,7 +38,7 @@ class _JournalScreenState extends State<JournalScreen> {
         'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 
     final url = Uri.parse(
-        'http://localhost:5175/api/Emotion/user/${userId}/journal-by-user');
+        'http://localhost:5000/api/Emotion/user/${userId}/journal-by-user');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -159,7 +159,7 @@ class _JournalScreenState extends State<JournalScreen> {
           ),
           Padding(
             padding:
-                const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 16),
+                const EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 16),
             child: Row(
               children: [
                 GestureDetector(
