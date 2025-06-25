@@ -17,7 +17,7 @@ void showAddTaskDialog(BuildContext context, VoidCallback onTaskAdded) {
       children: [
         GestureDetector(
           onTap: () => entry.remove(),
-          child: Container(color: Colors.black.withOpacity(0.5)),
+          child: Container(color: MyColors.black.withOpacity(0.5)),
         ),
         Center(
           child: Material(
@@ -188,7 +188,6 @@ void showAddTaskDialog(BuildContext context, VoidCallback onTaskAdded) {
                               setState(() {
                                 selectedDate = date;
                               });
-                              print("Selected date: $date");
                             },
                           ),
                         ),

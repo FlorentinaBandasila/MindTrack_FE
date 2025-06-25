@@ -45,6 +45,8 @@ void showTaskOptionsPopup(
     builder: (context) {
       return Dialog(
         backgroundColor: Colors.transparent,
+        elevation: 0, // elimină sombra material
+        insetPadding: EdgeInsets.zero,
         child: Center(
           child: Stack(
             children: [

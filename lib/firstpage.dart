@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindtrack/constant/constant.dart';
+import 'package:mindtrack/endpoint/google.dart';
 import 'package:mindtrack/forgotpassword.dart';
 import 'package:mindtrack/login.dart';
 import 'package:mindtrack/register.dart';
@@ -52,7 +53,6 @@ class StartPage extends StatelessWidget {
                     fontFamily: 'Inter-VariableFont_opsz,wght',
                   ),
                 ),
-                const SizedBox(height: 20),
                 Image.asset(
                   'assets/icons/mind.png',
                   width: 490,
@@ -143,6 +143,35 @@ class StartPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
+                Center(
+                  child: GestureDetector(
+                    onTap: () => signInWithGoogle(context),
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: MyColors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: MyColors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Image.asset(
+                          'assets/icons/google.png',
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),

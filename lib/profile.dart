@@ -4,7 +4,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindtrack/about.dart';
 import 'package:mindtrack/constant/constant.dart';
 import 'package:mindtrack/endpoint/editavatar.dart';
-
 import 'package:mindtrack/endpoint/getquizresults.dart';
 import 'package:mindtrack/endpoint/getuser.dart';
 import 'package:mindtrack/firstpage.dart';
@@ -12,8 +11,8 @@ import 'package:mindtrack/journal.dart';
 import 'package:mindtrack/login.dart';
 import 'package:mindtrack/models/avatars.dart';
 import 'package:mindtrack/models/usermodel.dart';
-import 'dart:io';
-import 'package:flutter/services.dart';
+import 'package:mindtrack/questions.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final storage = FlutterSecureStorage();
 
@@ -30,6 +29,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserModel? _user;
   String? selectedAvatar;
 
+  DateTime? _lastQuizDate;
+  bool _canRetakeQuiz = false;
+
   final user_nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
@@ -44,19 +46,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadUser() async {
     final user = await getUser();
     if (!mounted) return;
-
     if (user != null) {
-      final title = await fetchLatestQuizTitle();
+      final quizResult = await fetchLatestQuizResult();
       if (!mounted) return;
-
+      final DateTime? quizDate = quizResult?.date;
+      final now = DateTime.now();
+      bool canRetake = false;
+      if (quizDate != null) {
+        canRetake = now.difference(quizDate).inDays >= 14;
+      }
       setState(() {
         _user = user;
-        user_nameController.text = user.username ?? "";
-        emailController.text = user.email ?? "";
-        phoneController.text = user.phone ?? "";
-        moodController.text = title ?? "Unknown";
+        user_nameController.text = user.username ?? '';
+        emailController.text = user.email ?? '';
+        phoneController.text = user.phone ?? '';
+        moodController.text = quizResult?.title ?? 'Unknown';
         _isLoading = false;
         selectedAvatar = user.avatar;
+        _lastQuizDate = quizDate;
+        _canRetakeQuiz = canRetake;
       });
     } else {
       if (!mounted) return;
@@ -64,10 +72,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  void _showRetakeDialog() {
+    final daysLeft = _lastQuizDate != null
+        ? 14 - DateTime.now().difference(_lastQuizDate!).inDays
+        : 14;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Quiz Locked'),
+        content: Text('Retake Quiz available in $daysLeft days'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleAvatarChange(String avatar) async {
     final success = await updateAvatar(avatar);
     if (!mounted) return;
-
     if (success) {
       await _loadUser();
     } else {
@@ -90,14 +116,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   top: 0,
                   left: 0,
                   right: 0,
-                  child: Image.asset("assets/icons/fundal_profil.png"),
+                  child: Image.asset('assets/icons/fundal_profil.png'),
                 ),
                 SingleChildScrollView(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 60),
+                      const SizedBox(height: 32),
                       GestureDetector(
                         onTap: _showAvatarPicker,
                         child: Center(
@@ -114,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     selectedAvatar!.isNotEmpty
                                 ? ClipOval(
                                     child: Image.asset(
-                                      "assets/avatars/$selectedAvatar",
+                                      'assets/avatars/$selectedAvatar',
                                       fit: BoxFit.cover,
                                       width: 160,
                                       height: 160,
@@ -130,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       _buildProfileField(const Icon(Icons.person),
                           user_nameController, isEditing),
                       _buildProfileField(
@@ -138,22 +163,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _buildProfileField(
                           const Icon(Icons.phone), phoneController, isEditing),
                       _buildProfileField(
-                        Image.asset("assets/icons/examination.png"),
+                        Image.asset('assets/icons/examination.png'),
                         moodController,
                         isEditing,
                         alwaysReadOnly: true,
                       ),
-                      const SizedBox(height: 36),
+                      const SizedBox(height: 22),
                       Container(
                         width: 300,
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.book_outlined, "Journal", () {
+                      GestureDetector(
+                        onTap: _canRetakeQuiz
+                            ? () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const QuizPage()),
+                                )
+                            : _showRetakeDialog,
+                        child: Container(
+                          height: 45,
+                          padding: const EdgeInsets.symmetric(horizontal: 25),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.restart_alt_rounded,
+                                size: 30,
+                                color: MyColors.black,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                'Retake Quiz',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: MyColors.black,
+                                  fontFamily: 'Inter-VariableFont_opsz,wght',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 300,
+                        height: 2,
+                        color: MyColors.black.withOpacity(0.5),
+                      ),
+                      _buildMenuItem(Icons.book_outlined, 'Journal', () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => JournalScreen()),
+                          MaterialPageRoute(builder: (_) => JournalScreen()),
                         );
                       }),
                       const SizedBox(height: 4),
@@ -162,11 +223,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.info_outline, "About Us", () {
+                      _buildMenuItem(Icons.info_outline, 'About Us', () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const AboutScreen()),
+                              builder: (_) => const AboutScreen()),
                         );
                       }),
                       const SizedBox(height: 4),
@@ -175,22 +236,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 2,
                         color: MyColors.black.withOpacity(0.5),
                       ),
-                      _buildMenuItem(Icons.logout, "Log Out", () async {
+                      _buildMenuItem(
+                          Icons.emergency_outlined, "Suicide Help Line",
+                          () async {
+                        final Uri phoneUri =
+                            Uri(scheme: 'tel', path: '0800801200');
+                        if (await canLaunchUrl(phoneUri)) {
+                          await launchUrl(phoneUri);
+                        } else {
+                          print('Could not launch phone dialer');
+                        }
+                      }),
+                      const SizedBox(height: 4),
+                      Container(
+                        width: 300,
+                        height: 2,
+                        color: MyColors.black.withOpacity(0.5),
+                      ),
+                      _buildMenuItem(Icons.logout, 'Log Out', () async {
                         await storage.delete(key: 'token');
                         if (!context.mounted) return;
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => StartPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => StartPage()),
                         );
                       }),
-                      const SizedBox(height: 4),
-                      Container(
-                        width: 300,
-                        height: 2,
-                        color: MyColors.black.withOpacity(0.5),
-                      ),
                       const SizedBox(height: 90),
                     ],
                   ),
@@ -217,11 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Row(
         children: [
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: iconWidget,
-          ),
+          SizedBox(width: 20, height: 20, child: iconWidget),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -265,10 +331,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   fontFamily: 'Inter-VariableFont_opsz,wght',
                   shadows: [
                     Shadow(
-                      offset: Offset(0, 1.5),
-                      blurRadius: 2,
-                      color: MyColors.black.withOpacity(0.4),
-                    ),
+                        offset: Offset(0, 1.5),
+                        blurRadius: 2,
+                        color: MyColors.black.withOpacity(0.4)),
                   ],
                 ),
               ),
@@ -310,10 +375,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : null,
                   ),
                   child: ClipOval(
-                    child: Image.asset(
-                      'assets/avatars/$avatar',
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.asset('assets/avatars/$avatar',
+                        fit: BoxFit.cover),
                   ),
                 ),
               );

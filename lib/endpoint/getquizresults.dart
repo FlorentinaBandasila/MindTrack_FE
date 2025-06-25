@@ -4,7 +4,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final FlutterSecureStorage storage = FlutterSecureStorage();
 
-Future<String?> fetchLatestQuizTitle() async {
+class QuizResult {
+  final String title;
+  final DateTime date;
+
+  QuizResult({required this.title, required this.date});
+}
+
+Future<QuizResult?> fetchLatestQuizResult() async {
   final token = await storage.read(key: 'token');
   if (token == null) return null;
 
@@ -17,14 +24,14 @@ Future<String?> fetchLatestQuizTitle() async {
   final url = Uri.parse('http://localhost:5000/api/Quiz/user/$userId/results');
   final response = await http.get(
     url,
-    headers: {
-      'Authorization': 'Bearer $token',
-    },
+    headers: {'Authorization': 'Bearer $token'},
   );
 
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);
-    return data['title'];
+    final title = data['title'] as String;
+    final date = DateTime.parse(data['date'] as String);
+    return QuizResult(title: title, date: date);
   } else {
     print("Failed to fetch quiz result: ${response.statusCode}");
     return null;

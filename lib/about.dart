@@ -91,10 +91,10 @@ class _AboutScreenState extends State<AboutScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'MindTrack is a modern mobile application designed to support mental well-being through self-awareness, reflection, and personal growth.\n\n'
+                    'Mind Track is a modern mobile application designed to support mental well-being through self-awareness, reflection, and personal growth.\n\n'
                     'We believe that understanding your emotions is the first step toward healing and resilience.\n\n'
-                    'With interactive features such as personality quizzes and mood tracking, MindTrack helps users explore their inner world in a safe and private space.\n\n'
-                    'Our goal is to make mental health support more accessible, proactive, and stigma-free. Whether you\'re navigating stress, working on self-improvement, or simply curious about your psychological patterns, MindTrack is here to guide you — one insight at a time.',
+                    'With interactive features such as personality quizzes and mood tracking, Mind Track helps users explore their inner world in a safe and private space.\n\n'
+                    'Our goal is to make mental health support more accessible, proactive, and stigma-free. Whether you\'re navigating stress, working on self-improvement, or simply curious about your psychological patterns, Mind Track is here to guide you — one insight at a time.',
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.6,

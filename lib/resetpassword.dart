@@ -57,7 +57,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Password reset successful.")),
+        const SnackBar(content: Text("Password reset successfully.")),
       );
       Navigator.pushReplacement(
         context,
