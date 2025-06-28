@@ -39,8 +39,8 @@ Future<Map<String, dynamic>?> submitQuizAnswers(
     return null;
   }
 
-  final url =
-      Uri.parse('http://localhost:5000/api/Quiz/user/$userId/submit-answers');
+  final url = Uri.parse(
+      'http://192.168.1.135:5175/api/Quiz/user/$userId/submit-answers');
 
   final response = await http.post(
     url,

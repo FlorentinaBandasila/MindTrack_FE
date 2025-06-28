@@ -38,7 +38,7 @@ class _JournalScreenState extends State<JournalScreen> {
         'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 
     final url = Uri.parse(
-        'http://localhost:5000/api/Emotion/user/${userId}/journal-by-user');
+        'http://192.168.1.135:5175/api/Emotion/user/${userId}/journal-by-user');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {

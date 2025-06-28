@@ -202,6 +202,30 @@ class _CalendarPageState extends State<CalendarPage> {
             'stressed': 0,
           }
         : emojiStats;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final dynamicHeightRaw = MediaQuery.of(context).padding.bottom;
+    final usableHeight = screenHeight - dynamicHeightRaw;
+
+// DEBUG: print screen heights
+    print('screenHeight: $screenHeight');
+    print('usableHeight: $usableHeight');
+    print('dynamicHeightRaw: $dynamicHeightRaw');
+
+// Final logic
+    double dynamicHeight;
+    double dynamicHeight1;
+
+    if (usableHeight >= 780) {
+      dynamicHeight = 285;
+      dynamicHeight1 = 390; // for tall devices like S20 FE
+    }
+    if (usableHeight <= 725) {
+      dynamicHeight1 = 345;
+      dynamicHeight = 245;
+    } else {
+      dynamicHeight = 245;
+      dynamicHeight1 = 390; // for devices with smaller usable height like S25
+    }
 
     return Scaffold(
       backgroundColor: MyColors.grey,
@@ -213,7 +237,7 @@ class _CalendarPageState extends State<CalendarPage> {
               const SizedBox(height: 26),
               Container(
                 width: 345,
-                height: 390,
+                height: dynamicHeight1,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: MyColors.pink,
@@ -282,7 +306,7 @@ class _CalendarPageState extends State<CalendarPage> {
               const SizedBox(height: 10),
               Container(
                 width: 345,
-                height: 245,
+                height: dynamicHeight,
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: MyColors.cream,

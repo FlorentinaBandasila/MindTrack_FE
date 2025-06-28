@@ -5,51 +5,43 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mindtrack/completeprofile.dart';
-import 'package:mindtrack/main_screen.dart';
-import 'package:mindtrack/questions.dart'; // Importă pagina de completare
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:http/http.dart' as http;
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:mindtrack/main_screen.dart';
-import 'package:mindtrack/questions.dart'; // asigură-te că ai acest import
+import 'package:mindtrack/main_screen.dart'; // has baseUrl
 
 Future<void> signInWithGoogle(BuildContext context) async {
   final storage = FlutterSecureStorage();
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final google = GoogleSignIn();
 
   try {
-    await _googleSignIn.signOut(); // resetare
-    final user = await _googleSignIn.signIn();
-
-    if (user == null) {
-      print("Sign-in cancelled");
-      return;
-    }
+    await google.signOut();
+    final user = await google.signIn();
+    if (user == null) return; // user cancelled
 
     final email = user.email;
-    final password = "google-auth-${user.id}";
+    final password = 'google-auth-${user.id}';
 
-    final loginUrl = Uri.parse('http://localhost:5000/api/login');
-    final loginBody = jsonEncode({
-      "identifier": email,
-      "password": password,
-    });
-
-    final loginResponse = await http.post(
-      loginUrl,
-      headers: {"Content-Type": "application/json"},
-      body: loginBody,
+    final loginRes = await http.post(
+      Uri.parse('http://192.168.1.135:5175/api/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'identifier': email,
+        'password': password,
+      }),
     );
 
-    if (loginResponse.statusCode == 200) {
-      final token = loginResponse.body; // JWT token direct
-      final userId = JwtDecoder.decode(token)['nameid'];
+    if (loginRes.statusCode == 200) {
+      String token;
+      try {
+        final data = jsonDecode(loginRes.body);
+        token = data['token'] as String? ?? loginRes.body;
+      } catch (_) {
+        token = loginRes.body;
+      }
 
+      final userId = JwtDecoder.decode(token)['nameid'].toString();
       await storage.write(key: 'token', value: token);
       await storage.write(key: 'userId', value: userId);
+      await storage.delete(key: 'selected_mood');
+      await storage.delete(key: 'selected_mood_date');
 
       Navigator.pushReplacement(
         context,
@@ -62,16 +54,14 @@ Future<void> signInWithGoogle(BuildContext context) async {
       context,
       MaterialPageRoute(
         builder: (_) => CompleteProfileScreen(
-          email: user.email,
-          avatarUrl: user.photoUrl ?? "profile1.png",
+          email: email,
+          avatarUrl: user.photoUrl ?? 'profile1.png',
           googleId: user.id,
         ),
       ),
     );
   } catch (e) {
-    print("Sign-in error: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Sign-in failed: $e')),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Google sign-in error: $e')));
   }
 }

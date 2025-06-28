@@ -63,7 +63,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             Positioned(
               left: 0,
               right: 0,
-              bottom: 10,
+              bottom: 20,
               child: BottomMenu(),
             ),
         ],

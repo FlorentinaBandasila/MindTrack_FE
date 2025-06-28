@@ -22,7 +22,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Future<bool> resetPasswordWithCode(
       String email, String code, String newPassword) async {
-    final url = Uri.parse("http://localhost:5000/api/User/reset-password-code");
+    final url =
+        Uri.parse("http://192.168.1.135:5175/api/User/reset-password-code");
 
     try {
       final response = await http.post(

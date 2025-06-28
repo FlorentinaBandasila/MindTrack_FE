@@ -30,7 +30,7 @@ Future<void> submitUserTask(UserTaskDTO task) async {
   );
 
   final response = await http.post(
-    Uri.parse('http://localhost:5000/api/UserTask'),
+    Uri.parse('http://192.168.1.135:5175/api/UserTask'),
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',

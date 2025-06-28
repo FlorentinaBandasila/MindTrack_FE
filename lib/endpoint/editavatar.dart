@@ -10,7 +10,8 @@ Future<bool> updateAvatar(String avatar) async {
   final userId = decodedToken[
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 
-  final url = Uri.parse('http://localhost:5000/api/User/update-avatar/$userId');
+  final url =
+      Uri.parse('http://192.168.1.135:5175/api/User/update-avatar/$userId');
 
   final response = await http.put(
     url,

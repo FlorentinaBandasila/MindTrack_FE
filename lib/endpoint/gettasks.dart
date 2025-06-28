@@ -17,7 +17,7 @@ Future<List<UserTask?>> fetchUserTasks() async {
   print('UserId from token: $userId');
 
   final url =
-      Uri.parse('http://localhost:5000/api/UserTask/user/$userId/today');
+      Uri.parse('http://192.168.1.135:5175/api/UserTask/user/$userId/today');
   final response = await http.get(
     url,
     headers: {'Authorization': 'Bearer $token'},

@@ -65,12 +65,12 @@ class _AboutScreenState extends State<AboutScreen> {
             ),
           ),
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.16,
+            top: MediaQuery.of(context).size.height * 0.12,
             left: 0,
             right: 0,
             child: Container(
               width: 300,
-              height: 540,
+              height: 605,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -91,10 +91,9 @@ class _AboutScreenState extends State<AboutScreen> {
                   ),
                   const SizedBox(height: 20),
                   const Text(
-                    'Mind Track is a modern mobile application designed to support mental well-being through self-awareness, reflection, and personal growth.\n\n'
-                    'We believe that understanding your emotions is the first step toward healing and resilience.\n\n'
-                    'With interactive features such as personality quizzes and mood tracking, Mind Track helps users explore their inner world in a safe and private space.\n\n'
-                    'Our goal is to make mental health support more accessible, proactive, and stigma-free. Whether you\'re navigating stress, working on self-improvement, or simply curious about your psychological patterns, Mind Track is here to guide you — one insight at a time.',
+                    ' Mind Track is a modern mobile app and your friendly companion on the journey to better mental well-being. Designed to support self-awareness, reflection, and personal growth, it helps you understand your emotions - the first step toward healing and resilience.\n\n'
+                    ' Inside the app, you’ll find a thoughtfully designed personality quiz and simple daily mood tracking tools to help you explore what’s going on in your mind and heart. Everything you share stays private and secure, so you can open up in a judgment-free space.\n\n'
+                    ' Our mission is to make mental health support easy to access, proactive, and free of stigma. Whether you’re handling stress, striving for personal growth, or simply curious about your emotional patterns, Mind Track is here to guide you - one insight at a time.',
                     style: TextStyle(
                       fontSize: 14,
                       height: 1.6,

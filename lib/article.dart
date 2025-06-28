@@ -61,7 +61,7 @@ class _ArticlePageState extends State<ArticlePage> {
       color: MyColors.grey,
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 9, top: 9, right: 9, bottom: 2),
+          padding: const EdgeInsets.only(left: 9, top: 9, right: 9, bottom: 0),
           child: Container(
             decoration: BoxDecoration(
               color: MyColors.turqouise,

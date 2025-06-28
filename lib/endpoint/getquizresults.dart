@@ -21,7 +21,8 @@ Future<QuizResult?> fetchLatestQuizResult() async {
   final userId = payload[
       'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
 
-  final url = Uri.parse('http://localhost:5000/api/Quiz/user/$userId/results');
+  final url =
+      Uri.parse('http://192.168.1.135:5175/api/Quiz/user/$userId/results');
   final response = await http.get(
     url,
     headers: {'Authorization': 'Bearer $token'},

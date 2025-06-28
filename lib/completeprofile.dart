@@ -1,12 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mindtrack/constant/constant.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:mindtrack/main_screen.dart';
 import 'package:mindtrack/questions.dart';
+import 'package:mindtrack/constant/constant.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   final String email;
@@ -32,7 +31,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   String? _error;
 
   Future<void> _submitProfile() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_fullNameController.text.trim().isEmpty ||
+        _usernameController.text.trim().isEmpty ||
+        _phoneController.text.trim().isEmpty) {
+      setState(() => _error = 'Please complete all fields');
+      return;
+    }
+
+    setState(() => _error = null);
 
     final body = jsonEncode({
       "username": _usernameController.text.trim(),
@@ -43,30 +49,33 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       "password": "google-auth-${widget.googleId}",
     });
 
-    final response = await http.post(
-      Uri.parse('http://localhost:5000/api/register/google'),
+    final res = await http.post(
+      Uri.parse('http://192.168.1.135:5175/api/register/google'),
       headers: {"Content-Type": "application/json"},
       body: body,
     );
 
-    print("RESPONSE BODY: ${response.body}");
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final token = response.body;
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      final data = jsonDecode(res.body) as Map<String, dynamic>;
+      final token = data['token'] as String?;
+      if (token == null) {
+        setState(() => _error = 'No token returned.');
+        return;
+      }
 
-      final userId = JwtDecoder.decode(token)['nameid'];
-
+      final userId = JwtDecoder.decode(token)['nameid'].toString();
       final storage = FlutterSecureStorage();
       await storage.write(key: 'token', value: token);
       await storage.write(key: 'userId', value: userId);
-
+      await storage.delete(key: 'selected_mood');
+      await storage.delete(key: 'selected_mood_date');
+      // now go to quiz
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const QuizPage()),
       );
-      // await storage.delete(key: 'selected_mood');
-      // await storage.delete(key: 'selected_mood_date');
     } else {
-      setState(() => _error = 'Failed to save profile: ${response.body}');
+      setState(() => _error = 'Registration failed: Username already exists');
     }
   }
 
@@ -120,7 +129,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             right: 0,
             child: Container(
               width: 300,
-              height: 320,
+              height: 330,
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -130,6 +139,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               ),
               child: Scrollbar(
                 child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.only(
                       bottom: MediaQuery.of(context).viewInsets.bottom),
                   child: Form(
@@ -202,16 +212,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         inputFormatters: keyboardType == TextInputType.phone
             ? [FilteringTextInputFormatter.digitsOnly]
             : null,
-        validator: (value) =>
-            value == null || value.isEmpty ? 'Required field' : null,
         decoration: InputDecoration(
           filled: true,
           fillColor: MyColors.pink,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: BorderSide.none),
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide.none,
+          ),
         ),
       ),
     );
